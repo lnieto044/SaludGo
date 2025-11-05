@@ -1,6 +1,5 @@
 Flask==3.0.2
 Werkzeug==3.0.2
-pandas==2.2.2
 openpyxl==3.1.2
 sqlalchemy
 gunicorn == 23.0.0
