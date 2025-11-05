@@ -1,0 +1,700 @@
+/* =====================  PALETA SALUDGO  ===================== */
+:root{
+  /* Marca */
+  --sg-green:#00A67E;
+  --sg-blue:#2F80ED;
+  --sg-red:#EB1C25;
+
+  /* Neutros */
+  --sg-ink:#14181C;      /* texto principal */
+  --sg-gray-700:#4A5568; /* texto secundario */
+  --sg-gray-300:#E5E7EB; /* bordes */
+  --sg-gray-100:#F3F4F6; /* fondo */
+  --sg-white:#FFFFFF;
+
+  /* Derivados */
+  --sg-blue-hover:#2360B3;
+  --sg-green-hover:#007A5F;
+  --sg-blue-tint:#D6E6FB;   /* 20% */
+  --sg-green-tint:#CCECE3;  /* 20% */
+}
+
+/* =====================  Bootstrap overrides  ===================== */
+:root{
+  --bs-body-bg: var(--sg-gray-100);
+  --bs-body-color: var(--sg-ink);
+  --bs-heading-color: var(--sg-ink);
+  --bs-border-color: var(--sg-gray-300);
+  --bs-primary: var(--sg-green);
+  --bs-secondary: var(--sg-blue);
+  --bs-danger: var(--sg-red);
+  --bs-link-color: var(--sg-blue);
+  --bs-link-hover-color: var(--sg-blue-hover);
+  --bs-focus-ring-color: rgba(0,166,126,.35);
+}
+
+html,body{
+  font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--sg-ink);
+  background:var(--sg-gray-100);
+}
+
+a{ color:var(--sg-blue); text-decoration:none }
+a:hover{ color:var(--sg-blue-hover); text-decoration:underline }
+
+/* ===== Secciones Home: identidad SaludGo ===== */
+.section{padding:64px 0}
+.section .section-title{font-weight:800; letter-spacing:.2px; margin-bottom:8px}
+.section .section-sub{color:var(--sg-gray-700); margin-bottom:24px}
+
+.kpi-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kpi-pill{
+  background:var(--sg-white); border:1px solid var(--sg-gray-300);
+  border-radius:14px; padding:16px;
+  box-shadow:0 10px 22px rgba(20,24,28,.06); text-align:center
+}
+.kpi-pill .n{font-size:28px; font-weight:800; color:var(--sg-ink); line-height:1}
+.kpi-pill small{color:var(--sg-gray-700); font-weight:600}
+
+/* Por qué elegirnos */
+.reasons{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width: 992px){ .reasons{grid-template-columns:repeat(2,1fr)} }
+@media (max-width: 576px){ .reasons{grid-template-columns:1fr} }
+.reason-card{
+  background:var(--sg-white); border:1px solid var(--sg-gray-300);
+  border-radius:14px; padding:18px; height:100%;
+  box-shadow:0 10px 22px rgba(20,24,28,.06)
+}
+.reason-card h6{font-weight:800; margin-bottom:6px}
+.reason-card p{margin:0; color:var(--sg-gray-700)}
+.reason-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-bottom:10px;background:var(--sg-blue-tint);color:var(--sg-blue);font-weight:800
+}
+
+/* Contacto con foto completa a la izquierda (no recortada) */
+.contact-wrap{
+  background:var(--sg-white); border:1px solid var(--sg-gray-300); border-radius:16px;
+  overflow:hidden; box-shadow:0 12px 26px rgba(20,24,28,.08)
+}
+.contact-img{
+  background:#fff; display:flex; align-items:center; justify-content:center;
+}
+.contact-img img{width:100%; height:auto; display:block} /* NO recortar */
+.contact-body{padding:22px}
+
+/* Botones */
+.btn-pill{border-radius:999px; padding:.6rem 1.1rem; font-weight:700}
+
+/* (opcional) ocultar widgets de WhatsApp si hubiera scripts externos */
+#whatsapp-button,.whatsapp-chat,.wa-widget,.wa__btn_popup{display:none !important}
+
+
+/* =====================  Navbar  ===================== */
+.navbar{
+  background:var(--sg-white);
+  border-bottom:1px solid var(--sg-gray-300);
+}
+.navbar .logo{ height:38px }
+.navbar .nav-link{ color:var(--sg-ink); font-weight:600 }
+.navbar .nav-link:hover,.navbar .nav-link.active{ color:var(--sg-blue) }
+
+/* =====================  Botones e inputs  ===================== */
+.btn-primary{background:var(--sg-green);border:0}
+.btn-primary:hover{background:var(--sg-green-hover)}
+.btn-outline-primary{color:var(--sg-green);border-color:var(--sg-green)}
+.btn-outline-primary:hover{background:var(--sg-green);color:#fff}
+
+.form-control:focus,.form-select:focus{
+  border-color:var(--sg-green);
+  box-shadow:0 0 0 .2rem rgba(0,166,126,.15);
+}
+
+/* =====================  Tarjetas y estilos globales  ===================== */
+.card,.panel{
+  background:var(--sg-white);
+  border:1px solid var(--sg-gray-300);
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(20,24,28,.06);
+}
+
+.cardx{
+  background:var(--sg-white);
+  border:1px solid var(--sg-gray-300);
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 12px 26px rgba(0,0,0,.06);
+  transition:transform .15s, box-shadow .2s
+}
+.cardx:hover{ transform:translateY(-2px); box-shadow:0 20px 36px rgba(0,0,0,.1) }
+
+.split-left{
+  background:linear-gradient(180deg,#ff7a74,#ff9a7a);
+  color:#fff;display:flex;align-items:center;justify-content:center;padding:24px
+}
+.split-card{ border:0;border-radius:16px;overflow:hidden;box-shadow:0 18px 38px rgba(0,0,0,.1) }
+
+h2.section-title{font-weight:800;margin-bottom:.25rem}
+.section-sub{color:var(--sg-gray-700)}
+
+/* =====================  HERO / CARRUSEL  ===================== */
+/* Alto uniforme: cambia --hero-h si lo quieres más alto/bajo */
+.saludgo-hero { --hero-h: 420px; }
+@media (max-width: 992px){ .saludgo-hero { --hero-h: 340px; } }
+@media (max-width: 576px){ .saludgo-hero { --hero-h: 300px; } }
+
+.saludgo-hero .swiper,
+.saludgo-hero .swiper-wrapper,
+.saludgo-hero .swiper-slide{ height: var(--hero-h); }
+
+.saludgo-hero .swiper{
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(251, 249, 249, 0.08);
+  overflow: hidden;
+}
+
+.saludgo-hero .swiper-slide{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+.saludgo-hero .swiper-slide img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.saludgo-hero .hero-caption{
+  position:absolute;
+  left:16px; right:16px; bottom:16px;
+  padding:16px;
+  border-radius:12px;
+  background: linear-gradient(0deg, rgba(20,24,28,.65), rgba(20,24,28,.35));
+  color:#fff;
+  backdrop-filter: blur(2px);
+}
+.saludgo-hero .hero-caption h3{ margin:0 0 4px 0; font-weight:800 }
+.saludgo-hero .hero-caption p{ margin:0 0 10px 0 }
+.saludgo-hero .btn-cta{ background: var(--sg-green); border:0; font-weight:800 }
+.saludgo-hero .btn-cta:hover{ background: var(--sg-green-hover) }
+
+/* Forzar texto blanco en títulos del hero */
+.hero-caption h3{
+  color: #fff !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,.55);
+}
+
+/* =====================  CONTACTO COVER ===================== */
+.contacto-cover{
+  position:relative; height:100%;
+  border-radius:16px; overflow:hidden;
+  box-shadow:0 12px 28px rgba(0,0,0,.08);
+}
+.contacto-cover img{
+  width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  display:block;
+}
+.contacto-overlay{
+  position:absolute; left:0; right:0; bottom:0;
+  padding:18px; color:#fff;
+  background:linear-gradient(180deg, transparent 10%, rgba(0,0,0,.55) 90%);
+}
+.contacto-overlay h3{margin:0 0 6px 0; font-weight:800}
+.contacto-overlay p{margin:0 0 10px 0}
+.contacto-overlay .btn-cta{ background:var(--sg-green); border:0; font-weight:800 }
+.contacto-overlay .btn-cta:hover{ background:var(--sg-green-hover) }
+
+
+/* ====== Reportes: layout y tarjetas ====== */
+.reportes-grid{
+  display:grid;
+  grid-template-columns: 320px 1fr;
+  gap:18px;
+}
+@media (max-width: 1200px){
+  .reportes-grid{ grid-template-columns: 1fr; }
+}
+
+.kpi-box{
+  background:var(--sg-white);
+  border:1px solid var(--sg-gray-300);
+  border-radius:14px;
+  padding:16px 18px;
+  box-shadow:0 8px 20px rgba(20,24,28,.06);
+  margin-bottom:12px;
+}
+.kpi-title{ font-weight:700; color:var(--sg-gray-700); margin-bottom:6px; }
+.kpi-value{ font-weight:800; font-size:34px; margin:0; }
+
+.chart-card{
+  background:var(--sg-white);
+  border:1px solid var(--sg-gray-300);
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(20,24,28,.06);
+  --padding:3px;
+}
+.chart-title{ font-weight:800; margin:4px 6px 10px; }
+.chart-box{ height:240px; }
+
+/* =====================  Tablas y Alerts  ===================== */
+.table thead th{ background:var(--sg-gray-100) }
+.table tbody tr:hover{ background:#FAFAFA }
+.alert-info{ background:var(--sg-blue-tint); border-color:var(--sg-blue); color:#0b3e7a }
+.alert-success{ background:var(--sg-green-tint); border-color:var(--sg-green); color:var(--sg-green-hover) }
+
+/* =====================  Reportes: gráficas compactas/alineadas  ===================== */
+.chart-card .chart-box{ height:207px }            /* misma altura para tarjetas de gráficos */
+@media (min-width:1400px){ .chart-card .chart-box{ height:207px } }
+.chart-box canvas{ width:100% !important; height:100% !important }
+
+/* Títulos de gráficos más pro */
+.chart-title{
+  font-weight:800; font-size:16px; color:var(--sg-ink);
+  margin:0 0 8px 0; letter-spacing:.2px;
+}
+
+/* Leyendas compactas */
+.chart-legend{
+  font-size:12px; color:var(--sg-gray-700);
+}
+/* =====================  KPIs  ===================== */
+.kpi{
+  margin-bottom:12px;padding:18px 20px;border-radius:12px;
+  background:var(--sg-white);border:1px solid var(--sg-gray-300);
+  box-shadow:0 8px 20px rgba(20,24,28,.06);border-left:6px solid var(--sg-blue);
+}
+.kpi:nth-child(2){ border-left-color:var(--sg-green) }
+.kpi:nth-child(3){ border-left-color:var(--sg-red) }
+.kpi h6{ margin:0 0 6px 0; color:var(--sg-gray-700); font-weight:700 }
+.kpi .n{ font-size:36px;line-height:1.05;font-weight:800;color:var(--sg-ink) }
+
+/* =====================  Segmentadores (checks/filtros)  ===================== */
+.seg .form-check{ margin:.45rem 0 }
+.seg .form-check-input{ transform:scale(1.05) }
+
+
+/* =====================  Tarjetas / Paneles  ===================== */
+.card,.panel{
+  background:var(--sg-white);
+  border:1px solid var(--sg-gray-300);
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(20,24,28,.06);
+}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px 8px 12px;border-bottom:1px solid var(--sg-gray-300);
+}
+.panel-title{
+  margin:0;font-weight:800;letter-spacing:.3px;
+  font-size:17px;color:var(--sg-ink);
+}
+.panel-body{ padding:12px }
+
+/* Gráficas: MISMA DIMENSIÓN y compactas (más chicas para alinear) */
+.chart-card .chart-box{height:220px}
+@media (min-width:1400px){ .chart-card .chart-box{height:220px} }
+.chart-box canvas{width:100% !important;height:100% !important}
+
+/* ===== Auth modal (login/registro) ===== */
+.auth-modal{
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.auth-hero{
+  min-height: 420px; /* altura agradable del panel izquierdo */
+  display: flex;
+  align-items: center;
+}
+
+.auth-rocket{
+  font-size: 42px;
+  line-height: 1;
+  display: inline-block;
+}
+
+/* Tabs del modal */
+.auth-tabs .nav-link{
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  color: var(--sg-blue);
+  border: 1px solid transparent;
+}
+.auth-tabs .nav-link.active{
+  background: var(--sg-blue-tint);
+  color: var(--sg-blue);
+  border-color: var(--sg-blue);
+}
+
+/* ====== Auth modal: inputs y botones consistentes ====== */
+.auth-form .form-control{
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+/* Botón principal en el modal: mismo look que el resto del sitio */
+.auth-form .btn.btn-primary{
+  background: var(--sg-green);
+  border: 0;
+  color: #fff;
+  border-radius: 12px;         /* ← aquí estaba el error de sintaxis */
+  transition: transform .08s ease, box-shadow .2s ease, background-color .15s ease;
+}
+
+.auth-form .btn.btn-primary:hover{
+  background: var(--sg-green-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0,166,126,.22);
+}
+
+.auth-form .btn.btn-primary:active{
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0,166,126,.20);
+}
+
+.auth-form .btn.btn-primary:focus{
+  outline: none;
+  box-shadow: 0 0 0 .2rem rgba(0,166,126,.25);
+}
+
+/* Pestañas Ingresar / Registrarme con la paleta */
+.nav-pills .nav-link{
+  color: var(--sg-ink);
+  border-radius: 999px;
+  font-weight: 600;
+}
+.nav-pills .nav-link:hover{
+  color: var(--sg-blue);
+}
+.nav-pills .nav-link.active{
+  background: var(--sg-green);
+  color: #fff;
+}
+
+.btn-outline-primary{color:var(--sg-green);border-color:var(--sg-green)}
+.btn-outline-primary:hover{background:var(--sg-green);color:#fff}
+
+/* ===================== Publicaciones ===================== */
+.post-section .section-title{font-weight:800}
+.post-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+@media (max-width: 992px){ .post-grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width: 576px){ .post-grid{grid-template-columns:1fr} }
+
+.post-card{
+  background:var(--sg-white);
+  border:1px solid var(--sg-gray-300);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 12px 26px rgba(20,24,28,.06);
+  display:flex;flex-direction:column;
+}
+.post-card .cover{
+  width:100%; height:190px; object-fit:cover; display:block;
+}
+.post-card .body{padding:14px 16px; display:flex; flex-direction:column; gap:8px}
+.post-card h5{font-weight:800; margin:0}
+.post-meta{color:var(--sg-gray-700); font-size:.9rem}
+.post-excerpt{color:var(--sg-ink); opacity:.9}
+.post-card .actions{margin-top:auto; padding:12px 16px 16px}
+.post-tag{
+  display:inline-block; font-weight:700; font-size:.75rem;
+  background:var(--sg-blue-tint); color:var(--sg-blue);
+  border-radius:999px; padding:.25rem .55rem; margin-right:.35rem
+}
+
+/* ======== Participa (estilos) ======== */
+.participa h2{ font-weight:800; letter-spacing:.2px }
+
+.participa .info-cta{
+  background: var(--sg-blue-tint);
+  border: 1px solid var(--sg-blue);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.participa .card{
+  border:1px solid var(--sg-gray-300);
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(20,24,28,.06);
+}
+
+.participa .card h5{
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.participa .form-label{
+  font-weight:600;
+  color: var(--sg-gray-700);
+}
+
+.participa .form-control,
+.participa .form-select{
+  border-radius:10px;
+  padding:10px 12px;
+}
+
+.participa .btn{
+  border-radius:12px;
+}
+.participa .btn-primary{
+  background:var(--sg-green); border:0;
+}
+.participa .btn-primary:hover{ background:var(--sg-green-hover) }
+
+.participa .btn-outline-dark{
+  border-color: var(--sg-ink);
+  color: var(--sg-ink);
+}
+.participa .btn-outline-dark:hover{
+  background: var(--sg-ink);
+  color:#fff;
+}
+
+/* igual altura en desktop */
+@media (min-width: 992px){
+  .part-row .col-lg-6{ display:flex }
+  .part-row .card{ width:100% }
+}
+
+/* === Chatbot SaludGo === */
+
+#sg-chatbot {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1080;
+  font-family: inherit;
+}
+
+/* Botón flotante */
+.sg-chat-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  background: linear-gradient(135deg, var(--sg-green), var(--sg-blue));
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+}
+
+.sg-chat-toggle-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--sg-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--sg-green);
+}
+
+.sg-chat-toggle-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Panel del chat */
+.sg-chat-panel {
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 520px;
+  background: var(--sg-white);
+  border-radius: 20px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.55);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.sg-chat-header {
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--sg-green), var(--sg-blue));
+  color: var(--sg-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sg-chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sg-chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--sg-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--sg-green);
+}
+
+.sg-chat-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sg-chat-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sg-chat-subtitle {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.sg-chat-close {
+  border: none;
+  background: transparent;
+  color: var(--sg-white);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Área de mensajes */
+.sg-chat-messages {
+  padding: 12px 14px;
+  flex: 1;
+  overflow-y: auto;
+  background: var(--sg-gray-100);
+}
+
+.sg-chat-message {
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.sg-chat-message-bot {
+  justify-content: flex-start;
+}
+
+.sg-chat-message-user {
+  justify-content: flex-end;
+}
+
+.sg-chat-bubble {
+  max-width: 88%;
+  padding: 8px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-line; /* respeta saltos de línea pero sin sangrías raras */
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+/* Burbujas según emisor */
+.sg-chat-message-bot .sg-chat-bubble {
+  background: var(--sg-white);
+  border: 1px solid var(--sg-gray-300);
+  border-bottom-left-radius: 6px;
+  color: var(--sg-ink);
+}
+
+.sg-chat-message-user .sg-chat-bubble {
+  background: var(--sg-green);
+  color: var(--sg-white);
+  border-bottom-right-radius: 6px;
+}
+
+/* Área de entrada */
+.sg-chat-input-area {
+  display: flex;
+  align-items: flex-end;
+  padding: 8px;
+  border-top: 1px solid var(--sg-gray-300);
+  gap: 6px;
+  background: var(--sg-white);
+}
+
+.sg-chat-input {
+  flex: 1;
+  resize: none;
+  border-radius: 12px;
+  border: 1px solid var(--sg-gray-300);
+  padding: 7px 10px;
+  font-size: 13px;
+  max-height: 80px;
+  outline: none;
+}
+
+.sg-chat-input:focus {
+  border-color: var(--sg-green);
+  box-shadow: 0 0 0 1px var(--sg-green-tint);
+}
+
+.sg-chat-send {
+  border: none;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--sg-green);
+  color: var(--sg-white);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sg-chat-send:hover {
+  background: var(--sg-green-hover);
+}
+
+/* Indicador de "escribiendo" */
+.sg-chat-typing {
+  font-size: 11px;
+  color: var(--sg-gray-700);
+  margin-bottom: 4px;
+}
+
+/* Reservamos espacio a la izquierda para el avatar */
+.sg-chat-message-bot {
+  justify-content: flex-start;
+  position: relative;
+  padding-left: 38px;  /* espacio para el circulito */
+}
+
+/* Dibujamos el avatar del bot con el logo de SaludGo */
+.sg-chat-message-bot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--sg-white);
+  border: 1px solid var(--sg-green-tint);
+  background-image: url("https://res.cloudinary.com/dbussh6oa/image/upload/v1762240874/doctor_psfwwp.png");
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.18);
+}

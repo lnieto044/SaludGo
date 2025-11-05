@@ -1,0 +1,526 @@
+{% extends "base.html" %}
+{% block title %}Admin — SaludGo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Panel de Administración</h2>
+
+  <!-- ====== CREAR NUEVOS SERVICIOS / CAMPAÑAS ====== -->
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm p-3">
+        <h5>Nuevo servicio</h5>
+        <form method="post" action="{{ url_for('admin_services_create') }}">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <input name="depto" class="form-control" placeholder="Departamento">
+            </div>
+            <div class="col-md-6">
+              <input name="municipio" class="form-control" placeholder="Municipio">
+            </div>
+            <div class="col-md-8">
+              <input name="name" class="form-control" placeholder="Nombre del servicio" required>
+            </div>
+            <div class="col-md-4">
+              <select name="type" class="form-select">
+                <option>hospital</option>
+                <option>puesto</option>
+                <option>móvil</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <input name="lat" class="form-control" placeholder="Latitud (opcional)">
+            </div>
+            <div class="col-md-6">
+              <input name="lon" class="form-control" placeholder="Longitud (opcional)">
+            </div>
+            <div class="col-md-6">
+              <input name="capacity" class="form-control" placeholder="Capacidad aprox.">
+            </div>
+            <div class="col-md-6 d-flex align-items-center gap-2">
+              <input type="checkbox" name="available" checked> Disponible
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow-sm p-3">
+        <h5>Nueva campaña</h5>
+        <form method="post" action="{{ url_for('admin_campaigns_create') }}">
+          <div class="row g-2">
+            <div class="col-md-8">
+              <input name="name" class="form-control" placeholder="Nombre" required>
+            </div>
+            <div class="col-md-4">
+              <select name="type" class="form-select">
+                <option>vacunación</option>
+                <option>brigada</option>
+                <option>consulta prioritaria</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <input type="date" name="fecha" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <input name="depto" class="form-control" placeholder="Departamento">
+            </div>
+            <div class="col-md-4">
+              <input name="municipio" class="form-control" placeholder="Municipio">
+            </div>
+            <div class="col-md-6">
+              <input name="expected_patients" class="form-control" placeholder="Pacientes estimados">
+            </div>
+            <div class="col-md-6">
+              <input name="target" class="form-control" placeholder="Población objetivo (opcional)">
+            </div>
+            <div class="col-12">
+              <input name="resources" class="form-control" placeholder="Recursos (opcional)">
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <!-- ====== LISTADOS ====== -->
+  <div class="row g-4">
+    <!-- Servicios -->
+    <div class="col-lg-6">
+      <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Servicios</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Municipio</th>
+                <th>Tipo</th>
+                <th>Cap.</th>
+                <th>Disp.</th>
+                <th class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in services %}
+              <tr>
+                <td class="fw-semibold">{{ s['name'] }}</td>
+                <td>{{ s['municipio'] or '' }}</td>
+                <td>{{ s['type'] }}</td>
+                <td>{{ s['capacity'] }}</td>
+                <td>{{ 'Sí' if s['available'] else 'No' }}</td>
+                <td class="text-end">
+                  <!-- EDITAR -->
+                  <button
+                    class="btn btn-sm btn-outline-primary me-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editServiceModal"
+                    data-id="{{ s['id'] }}"
+                    data-name="{{ s['name'] }}"
+                    data-type="{{ s['type'] }}"
+                    data-depto="{{ s['depto'] }}"
+                    data-municipio="{{ s['municipio'] }}"
+                    data-lat="{{ s['lat'] }}"
+                    data-lon="{{ s['lon'] }}"
+                    data-capacity="{{ s['capacity'] }}"
+                    data-available="{{ 1 if s['available'] else 0 }}">
+                    Editar
+                  </button>
+
+                  <!-- ELIMINAR -->
+                  <form class="d-inline" method="post" action="{{ url_for('admin_delete') }}"
+                        onsubmit="return confirm('¿Eliminar servicio?')">
+                    <input type="hidden" name="what" value="service">
+                    <input type="hidden" name="id" value="{{ s['id'] }}">
+                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                  </form>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="6" class="text-muted small">Sin servicios registrados.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campañas -->
+    <div class="col-lg-6">
+      <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Campañas</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Fecha</th>
+                <th>Municipio</th>
+                <th>Estimados</th>
+                <th class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in campaigns %}
+              <tr>
+                <td class="fw-semibold">{{ c['name'] }}</td>
+                <td>{{ c['fecha'] or '' }}</td>
+                <td>{{ c['municipio'] or '' }}</td>
+                <td>{{ c['expected_patients'] or 0 }}</td>
+                <td class="text-end">
+                  <!-- EDITAR -->
+                  <button
+                    class="btn btn-sm btn-outline-primary me-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editCampaignModal"
+                    data-id="{{ c['id'] }}"
+                    data-name="{{ c['name'] }}"
+                    data-type="{{ c['type'] }}"
+                    data-fecha="{{ c['fecha'] }}"
+                    data-depto="{{ c['depto'] }}"
+                    data-municipio="{{ c['municipio'] }}"
+                    data-expected="{{ c['expected_patients'] }}"
+                    data-target="{{ c['target'] }}"
+                    data-resources="{{ c['resources'] }}">
+                    Editar
+                  </button>
+
+                  <!-- ELIMINAR -->
+                  <form class="d-inline" method="post" action="{{ url_for('admin_delete') }}"
+                        onsubmit="return confirm('¿Eliminar campaña?')">
+                    <input type="hidden" name="what" value="campaign">
+                    <input type="hidden" name="id" value="{{ c['id'] }}">
+                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                  </form>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5" class="text-muted small">Sin campañas registradas.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Usuarios -->
+  <div class="row g-4 mt-2">
+    <div class="col-lg-6">
+      <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Usuarios</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in users %}
+              <tr>
+                <td class="fw-semibold">{{ u['username'] }}</td>
+                <td>{{ u['email'] or '' }}</td>
+                <td style="min-width:130px">
+                  <form method="post" action="{{ url_for('admin_users_role') }}">
+                    <input type="hidden" name="user_id" value="{{ u['id'] }}">
+                    <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
+                      <option value="user"  {% if u['role']=='user'  %}selected{% endif %}>user</option>
+                      <option value="admin" {% if u['role']=='admin' %}selected{% endif %}>admin</option>
+                    </select>
+                  </form>
+                </td>
+                <td class="text-end">
+                  <!-- EDITAR -->
+                  <button
+                    class="btn btn-sm btn-outline-primary me-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editUserModal"
+                    data-id="{{ u['id'] }}"
+                    data-username="{{ u['username'] }}"
+                    data-email="{{ u['email'] or '' }}">
+                    Editar
+                  </button>
+
+                  <form class="d-inline" method="post" action="{{ url_for('admin_delete') }}"
+                        onsubmit="return confirm('¿Eliminar usuario?')">
+                    <input type="hidden" name="what" value="user">
+                    <input type="hidden" name="id" value="{{ u['id'] }}">
+                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                  </form>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="text-muted small">Sin usuarios adicionales.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="text-muted small">
+          * Los nuevos usuarios quedan con rol <b>user</b>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <!-- ====== REGISTROS CIUDADANOS ====== -->
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Reportes de síntomas (últimos 20)</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Municipio</th>
+                <th>Síntoma</th>
+                <th>Detalles</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in reports %}
+              <tr>
+                <td>{{ r['fecha'] }}</td>
+                <td>{{ (r['depto'] or '') ~ ' / ' ~ (r['municipio'] or '') }}</td>
+                <td>{{ r['symptom'] }}</td>
+                <td class="text-truncate" style="max-width:320px">{{ r['details'] }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="text-muted">Sin registros aún.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Disponibilidad campañas (últimos 20)</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Horario</th>
+                <th>Persona</th>
+                <th>Municipio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in slots %}
+              <tr>
+                <td>{{ s['fecha'] }}</td>
+                <td>{{ s['horario'] }}</td>
+                <td>{{ s['username'] }}</td>
+                <td>{{ (s['depto'] or '') ~ ' / ' ~ (s['municipio'] or '') }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="text-muted">Sin registros aún.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================== MODALES (Editar) ================== -->
+
+<!-- Editar Servicio -->
+<div class="modal fade" id="editServiceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <form class="modal-content" method="post" action="{{ url_for('admin_services_update') }}">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar servicio</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body row g-3">
+        <input type="hidden" name="id" id="svc_id">
+        <div class="col-md-6">
+          <label class="form-label">Nombre</label>
+          <input class="form-control" name="name" id="svc_name" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Tipo</label>
+          <input class="form-control" name="type" id="svc_type">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Departamento</label>
+          <input class="form-control" name="depto" id="svc_depto">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Municipio</label>
+          <input class="form-control" name="municipio" id="svc_municipio">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Lat</label>
+          <input class="form-control" name="lat" id="svc_lat">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Lon</label>
+          <input class="form-control" name="lon" id="svc_lon">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Capacidad</label>
+          <input type="number" min="0" class="form-control" name="capacity" id="svc_capacity">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="available" id="svc_available">
+            <label class="form-check-label" for="svc_available">Disponible</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Editar Campaña -->
+<div class="modal fade" id="editCampaignModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <form class="modal-content" method="post" action="{{ url_for('admin_campaigns_update') }}">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar campaña</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body row g-3">
+        <input type="hidden" name="id" id="cmp_id">
+        <div class="col-md-6">
+          <label class="form-label">Nombre</label>
+          <input class="form-control" name="name" id="cmp_name" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Tipo</label>
+          <input class="form-control" name="type" id="cmp_type">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Fecha</label>
+          <input type="date" class="form-control" name="fecha" id="cmp_fecha">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Departamento</label>
+          <input class="form-control" name="depto" id="cmp_depto">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Municipio</label>
+          <input class="form-control" name="municipio" id="cmp_municipio">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Pacientes esperados</label>
+          <input type="number" min="0" class="form-control" name="expected_patients" id="cmp_expected">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Población objetivo</label>
+          <input class="form-control" name="target" id="cmp_target">
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Recursos</label>
+          <textarea class="form-control" rows="3" name="resources" id="cmp_resources"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Editar Usuario -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <form class="modal-content" method="post" action="{{ url_for('admin_users_update') }}">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar usuario</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body row g-3">
+        <input type="hidden" name="id" id="usr_id">
+        <div class="col-12">
+          <label class="form-label">Usuario</label>
+          <input class="form-control" name="username" id="usr_username" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Correo</label>
+          <input type="email" class="form-control" name="email" id="usr_email">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+  // ----- Servicio -----
+  const serviceModal = document.getElementById('editServiceModal');
+  serviceModal?.addEventListener('show.bs.modal', e => {
+    const b = e.relatedTarget;
+    serviceModal.querySelector('#svc_id').value        = b.dataset.id || '';
+    serviceModal.querySelector('#svc_name').value      = b.dataset.name || '';
+    serviceModal.querySelector('#svc_type').value      = b.dataset.type || '';
+    serviceModal.querySelector('#svc_depto').value     = b.dataset.depto || '';
+    serviceModal.querySelector('#svc_municipio').value = b.dataset.municipio || '';
+    serviceModal.querySelector('#svc_lat').value       = b.dataset.lat || '';
+    serviceModal.querySelector('#svc_lon').value       = b.dataset.lon || '';
+    serviceModal.querySelector('#svc_capacity').value  = b.dataset.capacity || '';
+    serviceModal.querySelector('#svc_available').checked = (b.dataset.available === '1');
+  });
+
+  // ----- Campaña -----
+  const campModal = document.getElementById('editCampaignModal');
+  campModal?.addEventListener('show.bs.modal', e => {
+    const b = e.relatedTarget;
+    campModal.querySelector('#cmp_id').value        = b.dataset.id || '';
+    campModal.querySelector('#cmp_name').value      = b.dataset.name || '';
+    campModal.querySelector('#cmp_type').value      = b.dataset.type || '';
+    campModal.querySelector('#cmp_fecha').value     = (b.dataset.fecha || '').substring(0,10);
+    campModal.querySelector('#cmp_depto').value     = b.dataset.depto || '';
+    campModal.querySelector('#cmp_municipio').value = b.dataset.municipio || '';
+    campModal.querySelector('#cmp_expected').value  = b.dataset.expected || '';
+    campModal.querySelector('#cmp_target').value    = b.dataset.target || '';
+    campModal.querySelector('#cmp_resources').value = b.dataset.resources || '';
+  });
+
+  // ----- Usuario -----
+  const userModal = document.getElementById('editUserModal');
+  userModal?.addEventListener('show.bs.modal', e => {
+    const b = e.relatedTarget;
+    userModal.querySelector('#usr_id').value       = b.dataset.id || '';
+    userModal.querySelector('#usr_username').value = b.dataset.username || '';
+    userModal.querySelector('#usr_email').value    = b.dataset.email || '';
+  });
+</script>
+{% endblock %}

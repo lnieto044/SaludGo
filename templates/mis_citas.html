@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Mis citas — SaludGo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Mis citas</h2>
+
+  <div class="row g-4">
+    <!-- Tabla de citas -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Citas registradas</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th>Lugar</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in my_appointments %}
+              <tr>
+                <td>{{ c['fecha'] if c['fecha'] else 'Por asignar' }}</td>
+                <td>{{ c['hora'] if c['hora'] else 'Por asignar' }}</td>
+                <td>{{ c['tipo'] or '—' }}</td>
+                <td>{{ c['lugar'] or 'Por definir' }}</td>
+                <td>
+                  <span class="badge
+                    {% if c['estado'] == 'Agendada' %} bg-primary
+                    {% elif c['estado'] == 'Solicitud' %} bg-warning text-dark
+                    {% elif c['estado'] == 'Completada' %} bg-success
+                    {% elif c['estado'] == 'Cancelada' %} bg-secondary
+                    {% else %} bg-light text-dark{% endif %}">
+                    {{ c['estado'] }}
+                  </span>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5" class="text-muted small">
+                  Aún no tienes citas registradas.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Solicitar nueva cita -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Solicitar nueva cita</h5>
+        <form method="post" class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Tipo de cita</label>
+            <input class="form-control" name="tipo"
+                   placeholder="Medicina general, control, vacunación...">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Motivo o síntoma principal</label>
+            <textarea class="form-control" name="motivo" rows="3"
+                      placeholder="Describe brevemente el motivo de la consulta"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Fecha preferida</label>
+            <input type="date" class="form-control" name="preferencia_fecha"
+                   id="fecha_cita" min="{{ today }}" max="{{ max_date }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Horario preferido</label>
+            <input type="time" class="form-control" name="preferencia_hora">
+          </div>
+      
+          <div class="col-12">
+            <label class="form-label">Lugar</label>
+            <input class="form-control" name="lugar" placeholder="Puesto, hospital, dirección...">
+          </div>
+          <div class="col-12">
+            <button class="btn btn-primary w-100">Enviar solicitud</button>
+          </div>
+          <div class="col-12">
+            <p class="small text-muted mb-0">
+              Un administrador revisará tu solicitud y asignará fecha y lugar definitivos.
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+(function () {
+  // Fechas que ya alcanzaron el cupo máximo
+  //const disabledDates = {{ disabled_dates|tojson|safe }};
+  const inputFecha = document.getElementById('fecha_cita');
+
+  if (!inputFecha) return;
+
+  // Por si el backend no puso min/max en el HTML (aquí los aseguramos)
+  const minVal = "{{ today }}";
+  const maxVal = "{{ max_date }}";
+  if (minVal) inputFecha.min = minVal;
+  if (maxVal) inputFecha.max = maxVal;
+
+  inputFecha.addEventListener('change', function () {
+    if (this.value && disabledDates.includes(this.value)) {
+      alert('Esta fecha ya no tiene cupos de cita. Por favor elige otro día.');
+      this.value = '';
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}SaludGo{% endblock %}</title>
+
+  <!-- Fuentes + Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+  <!-- Tu CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {% block head_extra %}{% endblock %}
+  <style>.navbar-brand img{height:38px}</style>
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+      <!-- Logo en Cloudinary con fallback a texto -->
+      <img src="https://res.cloudinary.com/academia-geek-1/image/upload/v1759081635/logo_crfjxt.jpg"
+           alt="SaludGo"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <span class="fw-bold" style="display:none">SaludGo</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="nav" class="collapse navbar-collapse">
+      <!-- Menú público SOLO para visitantes (no autenticados) -->
+      {% if not user %}
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#servicios">Servicios</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#quienes">Quiénes somos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#elegirnos">¿Por qué elegirnos?</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#publicaciones">Publicaciones</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('participa') }}">Participa</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#contacto">Contáctenos</a></li>
+      </ul>
+      {% else %}
+      <!-- Usuario logueado (admin o user): sin menú público -->
+      <ul class="navbar-nav mx-auto"></ul>
+      {% endif %}
+
+      <div class="d-flex gap-2">
+        {% if user %}
+          <span class="navbar-text me-2">Bienvenido, <strong>{{ user['username'] }}</strong></span>
+
+          {% if user['role'] == 'admin' %}
+            <!-- Menú ADMIN -->
+            <a class="btn btn-outline-success btn-sm" href="{{ url_for('admin') }}">Panel</a>
+            <a class="btn btn-outline-success btn-sm" href="{{ url_for('perfil') }}">Mi perfil</a>
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_citas') }}">Registrar cita</a>
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_medicamentos') }}">Medicamentos</a>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reportes') }}">Reportes</a>
+          {% else %}
+            <!-- Menú USUARIO -->
+            <a class="btn btn-outline-success btn-sm" href="{{ url_for('perfil') }}">Mi perfil</a>
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('mis_citas') }}">Mis citas</a>
+          {% endif %}
+
+          <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Salir</a>
+        {% else %}
+          <!-- Botón que abre el modal -->
+          <button class="btn btn-outline-primary btn-sm"
+                  id="btnOpenAuth"
+                  data-bs-toggle="modal"
+                  data-bs-target="#authModal"
+                  data-next="">
+            Ingresar / Registrarme
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div style="padding-top:84px"></div>
+
+<!-- ================= FLASHES ================= -->
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="mt-2">
+        {% for cat, msg in messages %}
+          <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+</div>
+
+<!-- ================= CONTENIDO ================= -->
+{% block content %}{% endblock %}
+
+<footer class="py-4 text-center text-muted">MVP SaludGo · ©2025</footer>
+
+<!-- ================= MODAL AUTH ================= -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content auth-modal split-card">
+      <div class="row g-0 align-items-stretch">
+        <!-- Lado izquierdo -->
+        <div class="col-md-5 d-none d-md-flex split-left auth-hero"
+             style="
+               background:
+                 linear-gradient(135deg, rgba(12,87,155,.9), rgba(23,162,184,.85)),
+                 url('https://res.cloudinary.com/academia-geek-1/image/upload/v1759087228/ChatGPT_Image_28_sept_2025_13_46_43_r3icx0.png')
+                 center/cover no-repeat;
+               color:#fff;
+             ">
+          <div class="p-4 w-100 d-flex flex-column justify-content-between" style="min-height:100%">
+            <div>
+              <span class="badge bg-light text-primary text-uppercase mb-3">
+                SaludGo · Portal de salud
+              </span>
+              <h3 class="fw-bold mb-2">Organiza tu atención en salud, sin filas.</h3>
+              <p class="mb-0 small">
+                Agenda citas, sigue campañas y coordina servicios de tu territorio desde un solo lugar.
+              </p>
+            </div>
+            <ul class="list-unstyled small mt-3 mb-0">
+              <li class="d-flex align-items-center mb-1">
+                <span class="me-2">✅</span><span>Agendamiento en minutos.</span>
+              </li>
+              <li class="d-flex align-items-center mb-1">
+                <span class="me-2">✅</span><span>Recordatorios por correo.</span>
+              </li>
+              <li class="d-flex align-items-center">
+                <span class="me-2">✅</span><span>Enfoque en salud pública y comunidad.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Lado derecho (tabs + formularios) -->
+        <div class="col-md-7">
+          <div class="p-4">
+            <!-- Tabs: Ingresar / Registrarme / Recuperar clave (oculta) -->
+            <ul class="nav nav-pills auth-tabs mb-4" id="authTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="ingresar-tab"
+                        data-bs-toggle="tab" data-bs-target="#ingresar"
+                        type="button" role="tab" aria-controls="ingresar" aria-selected="true">
+                  Ingresar
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="registrarme-tab"
+                        data-bs-toggle="tab" data-bs-target="#registrarme"
+                        type="button" role="tab" aria-controls="registrarme" aria-selected="false">
+                  Registrarme
+                </button>
+              </li>
+              <!-- pestaña de recuperar clave OCULTA -->
+              <li class="nav-item d-none" role="presentation">
+                <button class="nav-link" id="forgot-tab"
+                        data-bs-toggle="tab" data-bs-target="#forgot"
+                        type="button" role="tab" aria-controls="forgot" aria-selected="false">
+                  Recuperar clave
+                </button>
+              </li>
+            </ul>
+
+            <!-- Contenido tabs -->
+            <div class="tab-content">
+
+              <!-- TAB: Ingresar -->
+              <div class="tab-pane fade show active" id="ingresar" role="tabpanel" aria-labelledby="ingresar-tab">
+                <form method="post" action="{{ url_for('auth_login') }}" class="auth-form" autocomplete="on">
+                  <input type="hidden" name="next" id="authNextLogin" value="{{ request.args.get('next','') }}">
+
+                  <div class="mb-3">
+                    <label for="login_user" class="form-label">Usuario</label>
+                    <input type="text"
+                           class="form-control"
+                           id="login_user"
+                           name="username"
+                           required
+                           autocomplete="username">
+                  </div>
+
+                  <div class="mb-1">
+                    <label for="login_pass" class="form-label mb-0">Contraseña</label>
+                    <input type="password"
+                           class="form-control"
+                           id="login_pass"
+                           name="password"
+                           required
+                           autocomplete="current-password">
+                  </div>
+                  <div class="mb-3 d-flex justify-content-end">
+                    <button type="button"
+                            class="btn btn-link btn-sm p-0"
+                            id="btnForgot">
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </div>
+
+                  <div class="mt-2">
+                    <button class="btn btn-primary w-100 py-2 fw-bold">Entrar</button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- TAB: Registrarme -->
+              <div class="tab-pane fade" id="registrarme" role="tabpanel" aria-labelledby="registrarme-tab">
+                <form method="post" action="{{ url_for('auth_register') }}" class="auth-form" autocomplete="on">
+                  <input type="hidden" name="next" id="authNextSignup" value="{{ request.args.get('next','') }}">
+
+                  <div class="mb-3">
+                    <label for="reg_user" class="form-label">Usuario</label>
+                    <input type="text" class="form-control" id="reg_user" name="username" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="reg_email" class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" id="reg_email" name="email" required>
+                  </div>
+                  <div class="mb-4">
+                    <label for="reg_pass" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="reg_pass" name="password" minlength="6" required>
+                  </div>
+                  <button class="btn btn-primary w-100 py-2 fw-bold">Crear cuenta</button>
+                </form>
+              </div>
+
+              <!-- TAB: Recuperar clave (no se ve en las pestañas, pero existe) -->
+              <div class="tab-pane fade" id="forgot" role="tabpanel" aria-labelledby="forgot-tab">
+                <form method="post" action="{{ url_for('auth_forgot') }}" class="auth-form">
+                  <div class="mb-3">
+                    <label class="form-label">Usuario o correo</label>
+                    <input type="text" class="form-control" name="identifier" required>
+                  </div>
+                  <p class="small text-muted mb-3">
+                    Si encontramos una cuenta asociada, te enviaremos un enlace para cambiar tu contraseña.
+                    Tendrás <strong>5 minutos</strong> para usarlo.
+                  </p>
+                  <button class="btn btn-primary w-100 py-2 fw-bold">Enviar enlace</button>
+                </form>
+              </div>
+
+            </div> <!-- /tab-content -->
+
+            <div class="text-center mt-4 small">
+              ¿Tienes dudas?
+              <a class="fw-semibold"
+                 href="{{ url_for('index') }}#contacto"
+                 id="contactFromAuthModal">
+                Contáctanos
+              </a>
+            </div>
+          </div>
+        </div> <!-- /col-md-7 -->
+      </div> <!-- /row -->
+    </div> <!-- /modal-content -->
+  </div> <!-- /modal-dialog -->
+</div> <!-- /modal -->
+
+{% if not user or user['role'] != 'admin' %}
+<div id="sg-chatbot">
+  <!-- Botón flotante -->
+  <button id="sg-chat-toggle" class="sg-chat-toggle" type="button" aria-label="Abrir chat SaludGo">
+    <span class="sg-chat-toggle-icon">
+      <img src="https://res.cloudinary.com/dbussh6oa/image/upload/v1762241375/equipo-medico_jdfajg.png"
+           alt="SaludGo"
+           onerror="this.style.display='none'; this.parentNode.textContent='SG';">
+    </span>
+  </button>
+
+  <!-- Panel del chat -->
+  <div id="sg-chat-panel" class="sg-chat-panel">
+    <div class="sg-chat-header">
+      <div class="sg-chat-header-left">
+        
+        <div>
+          <div class="sg-chat-title">Doctorsito</div>
+          <div class="sg-chat-subtitle">Orientación general en salud y servicios</div>
+        </div>
+      </div>
+      <button type="button" class="sg-chat-close" id="sg-chat-close" aria-label="Cerrar chat">×</button>
+    </div>
+
+    <div id="sg-chat-messages" class="sg-chat-messages">
+      <div class="sg-chat-message sg-chat-message-bot">
+        <div class="sg-chat-bubble">
+          <strong>Hola 👋 Soy Doctorsito de SaludGo.</strong><br>
+          Puedo orientarte sobre citas, campañas de salud, medicamentos registrados
+          y cómo participar como voluntario.<br><br>
+          Cuéntame, ¿en qué te puedo ayudar hoy?
+        </div>
+      </div>
+    </div>
+
+    <form id="sg-chat-form" class="sg-chat-input-area">
+      <textarea id="sg-chat-input" class="sg-chat-input" rows="1"
+                placeholder="Escribe tu duda aquí..." required></textarea>
+      <button class="sg-chat-send" type="submit">Enviar</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Scroll suave SOLO para enlaces tipo #ancla (por si los usas en el contenido)
+    document.querySelectorAll('a.nav-link, .navbar-brand').forEach(a => {
+      a.addEventListener('click', function (e) {
+        const href = a.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          e.preventDefault();
+          const el = document.querySelector(href);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Botón "¿Olvidaste tu contraseña?" -> activa pestaña Recuperar clave (oculta)
+    const forgotBtn = document.getElementById('btnForgot');
+    if (forgotBtn && window.bootstrap && bootstrap.Tab) {
+      forgotBtn.addEventListener('click', function () {
+        const forgotTabBtn = document.getElementById('forgot-tab');
+        if (forgotTabBtn) {
+          const tab = new bootstrap.Tab(forgotTabBtn);
+          tab.show();
+        }
+      });
+    }
+
+    // Abrir el modal automáticamente si viene ?show_login=1
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('show_login') === '1') {
+      const modalEl = document.getElementById('authModal');
+      if (modalEl && window.bootstrap && bootstrap.Modal) {
+        const m = new bootstrap.Modal(modalEl);
+        m.show();
+      }
+    }
+
+    // Link "Contáctanos" dentro del modal: cerrar modal y llevar a #contacto
+    const contactFromModal = document.getElementById('contactFromAuthModal');
+    if (contactFromModal) {
+      contactFromModal.addEventListener('click', function (e) {
+        e.preventDefault();
+        const href = this.getAttribute('href') || '{{ url_for("index") }}#contacto';
+        const modalEl = document.getElementById('authModal');
+
+        if (modalEl && window.bootstrap && bootstrap.Modal) {
+          const instance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+          instance.hide();
+
+          setTimeout(function () {
+            if (window.location.pathname === '{{ url_for("index") }}') {
+              const target = document.querySelector('#contacto');
+              if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                window.location.href = href;
+              }
+            } else {
+              window.location.href = href;
+            }
+          }, 200);
+        } else {
+          window.location.href = href;
+        }
+      });
+    }
+  });
+
+  // Cuando se va a mostrar el modal, elegimos la pestaña según la URL (?tab=login|signup|forgot)
+  document.addEventListener('show.bs.modal', function (ev) {
+    const modal = ev.target;
+    if (modal.id !== 'authModal') return;
+
+    const params = new URLSearchParams(window.location.search);
+    let tabParam = params.get('tab') || 'login';
+
+    let tabId = 'ingresar-tab';
+    if (tabParam === 'signup') tabId = 'registrarme-tab';
+    if (tabParam === 'forgot') tabId = 'forgot-tab';
+
+    const tabBtn = document.getElementById(tabId);
+    if (tabBtn && window.bootstrap && bootstrap.Tab) {
+      const tab = new bootstrap.Tab(tabBtn);
+      tab.show();
+    }
+  });
+
+  // Mantener el campo "next" cuando abres el modal desde un botón con data-next
+  document.addEventListener('shown.bs.modal', function (ev) {
+    const btn = ev.relatedTarget;
+    if (!btn) return;
+    const next = btn.getAttribute('data-next') || '';
+    const lg = document.getElementById('authNextLogin');
+    const sg = document.getElementById('authNextSignup');
+    if (lg) lg.value = next;
+    if (sg) sg.value = next;
+  });
+
+      // === Chatbot SaludGo ===
+    const chatToggle = document.getElementById('sg-chat-toggle');
+    const chatPanel  = document.getElementById('sg-chat-panel');
+    const chatClose  = document.getElementById('sg-chat-close');
+    const chatForm   = document.getElementById('sg-chat-form');
+    const chatInput  = document.getElementById('sg-chat-input');
+    const chatMsgs   = document.getElementById('sg-chat-messages');
+
+    function scrollChatToBottom() {
+      if (chatMsgs) {
+        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+      }
+    }
+
+    function addChatMessage(text, sender) {
+      if (!chatMsgs) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'sg-chat-message ' + (sender === 'user'
+                          ? 'sg-chat-message-user' : 'sg-chat-message-bot');
+      const bubble = document.createElement('div');
+      bubble.className = 'sg-chat-bubble';
+      bubble.textContent = text;
+      wrap.appendChild(bubble);
+      chatMsgs.appendChild(wrap);
+      scrollChatToBottom();
+    }
+
+    let typingEl = null;
+    function showTyping() {
+      if (!chatMsgs) return;
+      typingEl = document.createElement('div');
+      typingEl.className = 'sg-chat-typing';
+      typingEl.textContent = 'SaludGo Bot está escribiendo...';
+      chatMsgs.appendChild(typingEl);
+      scrollChatToBottom();
+    }
+    function hideTyping() {
+      if (typingEl && typingEl.parentNode) {
+        typingEl.parentNode.removeChild(typingEl);
+        typingEl = null;
+      }
+    }
+
+    if (chatToggle && chatPanel) {
+      chatToggle.addEventListener('click', function () {
+        const isOpen = chatPanel.style.display === 'flex';
+        chatPanel.style.display = isOpen ? 'none' : 'flex';
+      });
+    }
+    if (chatClose && chatPanel) {
+      chatClose.addEventListener('click', function () {
+        chatPanel.style.display = 'none';
+      });
+    }
+
+    if (chatForm && chatInput) {
+      chatForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const text = chatInput.value.trim();
+        if (!text) return;
+        addChatMessage(text, 'user');
+        chatInput.value = '';
+        showTyping();
+
+        try {
+          const resp = await fetch('{{ url_for("api_chatbot_message") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+          });
+          const data = await resp.json();
+          hideTyping();
+          if (data && data.reply) {
+            addChatMessage(data.reply, 'bot');
+          } else {
+            addChatMessage('Lo siento, hubo un problema al procesar tu mensaje. Intenta nuevamente.', 'bot');
+          }
+        } catch (err) {
+          hideTyping();
+          addChatMessage('No pude conectar con el servidor en este momento. Revisa tu conexión e inténtalo más tarde.', 'bot');
+        }
+      });
+    }
+
+</script>
+
+{% block scripts_extra %}{% endblock %}
+</body>
+</html>

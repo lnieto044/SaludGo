@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Participa — SaludGo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Participa en SaludGo</h2>
+  <p class="text-muted mb-4">
+    Cuéntanos qué está pasando en tu territorio o registra tu disponibilidad para apoyar campañas de salud.
+  </p>
+
+  {% if message %}
+    <div class="alert alert-success">{{ message }}</div>
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- ===== Reporte de síntomas ===== -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Reporte comunitario de síntomas</h5>
+          <p class="card-text small text-muted">
+            Si notas varios casos de una misma molestia en tu barrio, vereda, colegio o comunidad,
+            puedes reportarlo aquí. Esto no reemplaza la atención médica, pero ayuda a orientar campañas.
+          </p>
+
+          <form method="post" action="{{ url_for('participa') }}" class="row g-3">
+            <input type="hidden" name="form_type" value="symptom">
+
+            <!-- Honeypot anti-spam (oculto) -->
+            <input type="text" name="website" style="display:none">
+            <input type="text" name="homepage" style="display:none">
+
+            <div class="col-md-6">
+              <label class="form-label">Fecha del evento</label>
+              <input type="date" name="fecha" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Departamento</label>
+              <input type="text" name="depto" class="form-control" placeholder="Ej. Cundinamarca" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Municipio</label>
+              <input type="text" name="municipio" class="form-control" placeholder="Ej. Soacha" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Síntoma principal</label>
+              <input type="text" name="symptom" class="form-control"
+                     placeholder="Ej. fiebre, diarrea, tos fuerte..." required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Detalles adicionales</label>
+              <textarea name="details" rows="4" class="form-control"
+                        placeholder="Número aproximado de personas afectadas, barrio o vereda, edades, etc."></textarea>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary w-100">Enviar reporte</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Disponibilidad para campañas ===== -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Disponibilidad para apoyar campañas</h5>
+          <p class="card-text small text-muted">
+            Si puedes apoyar jornadas de salud (como voluntario, líder comunitario o personal de salud),
+            registra aquí tu disponibilidad. El equipo de coordinación usará esta información para programar campañas.
+          </p>
+
+          <form method="post" action="{{ url_for('participa') }}" class="row g-3">
+            <input type="hidden" name="form_type" value="avail">
+
+            <!-- Honeypot anti-spam (oculto) -->
+            <input type="text" name="website" style="display:none">
+            <input type="text" name="homepage" style="display:none">
+
+            <div class="col-md-6">
+              <label class="form-label">Fecha disponible</label>
+              <input type="date" name="fecha" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Horario</label>
+              <input type="text" name="horario" class="form-control"
+                     placeholder="Ej. Mañana, tarde o 8:00 a 12:00" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Nombre (opcional)</label>
+              <input type="text" name="username" class="form-control"
+                     placeholder="Puedes dejarlo en blanco si prefieres anonimato">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Departamento</label>
+              <input type="text" name="depto" class="form-control" placeholder="Ej. Cundinamarca">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Municipio</label>
+              <input type="text" name="municipio" class="form-control" placeholder="Ej. Soacha" required>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-success w-100">Registrar disponibilidad</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block title %}Mi perfil — SaludGo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Mi perfil</h2>
+
+  <div class="row g-4">
+    <!-- Tarjeta principal de perfil -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm p-3 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center"
+               style="width:70px;height:70px;background:#e7f5ff;">
+            <span class="fs-3 fw-bold text-primary">
+              {{ (user['username'][0] if user['username'] else '?')|upper }}
+            </span>
+          </div>
+          <div>
+            <div class="text-muted small">Usuario</div>
+            <h4 class="mb-0">{{ user['username'] }}</h4>
+            <div class="mt-1">
+              <span class="badge bg-success text-uppercase">
+                {{ user['role'] }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <dl class="row mb-0 small">
+          <dt class="col-4">Correo</dt>
+          <dd class="col-8">{{ user['email'] or 'Sin correo registrado' }}</dd>
+
+          <dt class="col-4">Miembro desde</dt>
+          <dd class="col-8">{{ user['created_at'] }}</dd>
+        </dl>
+
+        {% if user['role'] == 'admin' %}
+        <div class="mt-3">
+          <a href="{{ url_for('admin') }}" class="btn btn-outline-primary btn-sm">
+            Ir al panel de administración
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Datos editables + (opcional) resumen admin -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm p-3 mb-3">
+        <h5 class="mb-3">Actualizar datos de cuenta</h5>
+        <form method="post" action="{{ url_for('perfil_update') }}" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Usuario</label>
+            <input class="form-control" name="username" value="{{ user['username'] }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Correo</label>
+            <input type="email" class="form-control" name="email" value="{{ user['email'] or '' }}">
+          </div>
+          <div class="col-12">
+            <button class="btn btn-success">Guardar cambios</button>
+          </div>
+        </form>
+        <div class="text-muted small mt-2">
+          * El cambio de contraseña va por el flujo de "Recuperar clave".
+        </div>
+      </div>
+
+      {% if stats %}
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Resumen de tu entorno como administrador</h5>
+        <div class="row g-3 text-center">
+          <div class="col-6 col-md-4">
+            <div class="border rounded-3 py-2">
+              <div class="small text-muted">Servicios</div>
+              <div class="fs-4 fw-bold">{{ stats.services }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="border rounded-3 py-2">
+              <div class="small text-muted">Campañas</div>
+              <div class="fs-4 fw-bold">{{ stats.campaigns }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="border rounded-3 py-2">
+              <div class="small text-muted">Usuarios</div>
+              <div class="fs-4 fw-bold">{{ stats.users }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="border rounded-3 py-2">
+              <div class="small text-muted">Reportes</div>
+              <div class="fs-4 fw-bold">{{ stats.reports }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="border rounded-3 py-2">
+              <div class="small text-muted">Disponibilidades</div>
+              <div class="fs-4 fw-bold">{{ stats.slots }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Mis citas + Mis medicamentos -->
+  <div class="row g-4 mt-1">
+    <div class="col-lg-6">
+      <div class="card shadow-sm p-3 h-100">
+        <h5 class="mb-3">Mis citas próximas</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Servicio</th>
+                <th>Lugar</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in my_appointments %}
+              <tr>
+                <td>{{ c['fecha'] or '-' }}</td>
+                <td>{{ c['hora'] or '-' }}</td>
+                <td>{{ c['servicio'] or '-' }}</td>
+                <td>{{ c['lugar'] or '-' }}</td>
+                <td>{{ c['estado'] or 'programada' }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5" class="text-muted small">
+                  Aún no tienes citas registradas en el sistema.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-2 small text-muted">
+          Puedes ver más detalle o agendar nuevas citas en la sección <b>Mis citas</b>.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow-sm p-3 h-100">
+        <h5 class="mb-3">Mis entregas de medicamentos</h5>
+
+        <div class="row g-2 mb-2 small">
+          <div class="col-md-6">
+            <input id="medFilterNombre" class="form-control form-control-sm"
+                   placeholder="Filtrar por medicamento...">
+          </div>
+          <div class="col-md-6">
+            <input id="medFilterLugar" class="form-control form-control-sm"
+                   placeholder="Filtrar por lugar de entrega...">
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0" id="tablaMeds">
+            <thead>
+              <tr>
+                <th>Medicamento</th>
+                <th>Dosis</th>
+                <th>Frecuencia</th>
+                <th>Próx. entrega</th>
+                <th>Lugar</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in my_meds %}
+              <tr data-med="{{ m['medicamento'] or '' }}" data-lugar="{{ m['lugar'] or '' }}">
+                <td>{{ m['medicamento'] or '-' }}</td>
+                <td>{{ m['dosis'] or '-' }}</td>
+                <td>{{ m['frecuencia'] or '-' }}</td>
+                <td>{{ m['fecha_entrega'] or '-' }}</td>
+                <td>{{ m['lugar'] or '-' }}</td>
+                <td>{{ m['estado'] or 'pendiente' }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="6" class="text-muted small">
+                  Aún no tienes entregas de medicamentos registradas.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-2 small text-muted">
+          Usa los filtros de arriba para buscar por nombre de medicamento y lugar donde puedes recogerlo.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disponibilidad -->
+  <div class="row g-4 mt-1">
+    <div class="col-lg-8">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Mi disponibilidad registrada (últimos 5 envíos)</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Horario</th>
+                <th>Departamento</th>
+                <th>Municipio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in my_slots %}
+              <tr>
+                <td>{{ s['fecha'] }}</td>
+                <td>{{ s['horario'] }}</td>
+                <td>{{ s['depto'] }}</td>
+                <td>{{ s['municipio'] }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="text-muted small">
+                  Aún no has registrado disponibilidades con tu usuario.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+  (function () {
+    const inputNombre = document.getElementById('medFilterNombre');
+    const inputLugar = document.getElementById('medFilterLugar');
+    const rows = document.querySelectorAll('#tablaMeds tbody tr[data-med]');
+
+    function aplicarFiltro() {
+      const n = (inputNombre?.value || '').toLowerCase();
+      const l = (inputLugar?.value || '').toLowerCase();
+      rows.forEach(r => {
+        const med = (r.dataset.med || '').toLowerCase();
+        const lug = (r.dataset.lugar || '').toLowerCase();
+        const ok = (!n || med.includes(n)) && (!l || lug.includes(l));
+        r.style.display = ok ? '' : 'none';
+      });
+    }
+
+    inputNombre?.addEventListener('input', aplicarFiltro);
+    inputLugar?.addEventListener('input', aplicarFiltro);
+  })();
+</script>
+{% endblock %}

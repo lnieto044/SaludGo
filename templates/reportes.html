@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block title %}Reportes — SaludGo{% endblock %}
+
+{% block head_extra %}
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h3 class="mb-3 title-center">Reportes y análisis</h3>
+
+  <div class="row g-2">
+    <!-- Columna izquierda: KPIs + filtros -->
+    <div class="col-lg-3">
+      <div class="kpi">
+        <h6>Hombres (últ. año)</h6>
+        <div class="n" id="k_h">–</div>
+      </div>
+      <div class="kpi">
+        <h6>Mujeres (últ. año)</h6>
+        <div class="n" id="k_m">–</div>
+      </div>
+      <div class="kpi">
+        <h6>Centros de atención</h6>
+        <div class="n" id="k_c">–</div>
+      </div>
+
+      <div class="panel mt-2">
+        <div class="panel-head">
+          <h6 class="panel-title">ÁREA GEOGRÁFICA</h6>
+        </div>
+        <div class="panel-body seg">
+          <div class="form-check">
+            <input class="form-check-input f-area" type="checkbox" value="Cabecera Municipal" id="a1" checked>
+            <label class="form-check-label" for="a1">Cabecera Municipal</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input f-area" type="checkbox" value="Centros Poblados y Rural Disperso" id="a2" checked>
+            <label class="form-check-label" for="a2">Centros Poblados y Rural Disperso</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input f-area" type="checkbox" value="Total" id="a3">
+            <label class="form-check-label" for="a3">Total</label>
+          </div>
+          <small class="text-muted d-block mt-2">
+            Si marcas “Total”, se ignoran las demás para evitar doble conteo.
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: gráficas -->
+    <div class="col-lg-9">
+      <div class="row g-1">
+        <div class="col-lg-7 chart-card">
+          <div class="panel">
+            <div class="panel-head">
+              <h6 class="panel-title">Crecimiento Población</h6>
+            </div>
+            <div class="panel-body">
+              <div class="chart-box">
+                <canvas id="ch_crec"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5 chart-card">
+          <div class="panel">
+            <div class="panel-head">
+              <h6 class="panel-title">Proyección vacunas 2025</h6>
+            </div>
+            <div class="panel-body">
+              <div class="chart-box">
+                <canvas id="ch_vac"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-1 mt-1">
+        <div class="col-lg-6 chart-card">
+          <div class="panel">
+            <div class="panel-head">
+              <h6 class="panel-title">Distribución de la población</h6>
+            </div>
+            <div class="panel-body">
+              <div class="chart-box">
+                <canvas id="ch_pie"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 chart-card">
+          <div class="panel">
+            <div class="panel-head">
+              <h6 class="panel-title">Promedio Precipitaciones</h6>
+            </div>
+            <div class="panel-body">
+              <div class="chart-box">
+                <canvas id="ch_prec"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="alert alert-info mt-3">
+    Fuente: Excel <code>Proyeccciones_salud_limpia.xlsx</code> y CSV
+    <code>Precipitaciones_Totales_Mensuales_20250926.csv</code>.
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+/* ===== Colores de la paleta desde CSS ===== */
+const css = k => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+const COL = {
+  green: css('--sg-green'),
+  blue: css('--sg-blue'),
+  red: css('--sg-red'),
+  ink: css('--sg-ink'),
+  g700: css('--sg-gray-700'),
+  g300: css('--sg-gray-300'),
+  blueHover: css('--sg-blue-hover'),
+  greenHover: css('--sg-green-hover'),
+  blueTint: css('--sg-blue-tint'),
+  greenTint: css('--sg-green-tint'),
+};
+
+/* ===== Tema Chart.js compacto ===== */
+Chart.defaults.font.family = 'Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = COL.g700;
+Chart.defaults.borderColor = COL.g300;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+Chart.defaults.plugins.legend.labels.boxHeight = 10;
+
+let lineC, vacC, pieC, precC;
+const $ = id => document.getElementById(id);
+
+/* ===== Meses: abreviados y SIEMPRE 12 ===== */
+const MESES_CORTOS = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const to12 = (arr) => {
+  const a = Array.isArray(arr) ? arr.slice(0,12) : [];
+  return Array.from({length:12}, (_,i)=> a[i] ?? null);
+};
+
+function selectedAreas(){
+  const s = [...document.querySelectorAll('.f-area')].filter(x=>x.checked).map(x=>x.value);
+  return s.includes('Total') ? ['Total'] : (s.length ? s : ['Total']);
+}
+
+async function loadDash(){
+  const areas = selectedAreas().join(',');
+  const r = await fetch('/api/powerdash?areas='+encodeURIComponent(areas));
+  if(!r.ok){ console.error('No data'); return; }
+  const d = await r.json();
+
+  // KPIs
+  const nf = v => (v||0).toLocaleString('es-CO');
+  $('k_h').textContent = nf(d.resumen.hombres);
+  $('k_m').textContent = nf(d.resumen.mujeres);
+  $('k_c').textContent = nf(d.resumen.centros);
+
+  // ===== Crecimiento población (solo H/M) =====
+  if(lineC) lineC.destroy();
+  lineC = new Chart($('ch_crec'), {
+    type:'line',
+    data:{
+      labels:d.crecimiento.years,
+      datasets:[
+        {label:'Hombres', data:d.crecimiento.hombres, tension:.3, borderColor:COL.green, borderWidth:2, pointRadius:0},
+        {label:'Mujeres', data:d.crecimiento.mujeres, tension:.3, borderColor:COL.blueHover, borderWidth:2, pointRadius:0},
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'top', align:'start'}},
+      layout:{padding:{top:4,right:6,bottom:0,left:6}},
+      scales:{
+        x:{ticks:{font:{size:10}, maxRotation:0, autoSkip:true, padding:2}},
+        y:{ticks:{maxTicksLimit:5}}
+      }
+    }
+  });
+
+  // ===== Vacunas 2025: barras apiladas, 12 meses abreviados =====
+  if(vacC) vacC.destroy();
+  vacC = new Chart($('ch_vac'),{
+    type:'bar',
+    data:{
+      labels: MESES_CORTOS,
+      datasets:[
+        {label:'Hombres', data: to12(d.vacunas2025.hombres), backgroundColor:COL.blue,  borderRadius:6},
+        {label:'Mujeres', data: to12(d.vacunas2025.mujeres), backgroundColor:COL.green, borderRadius:6},
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'top', align:'start'}},
+      layout:{padding:{top:4,right:6,bottom:0,left:6}},
+      scales:{
+        x:{stacked:true, ticks:{font:{size:10}, maxRotation:0, autoSkip:false, padding:2}},
+        y:{stacked:true, beginAtZero:true, ticks:{maxTicksLimit:5}}
+      },
+      datasets:{bar:{barPercentage:.64, categoryPercentage:.62}}
+    }
+  });
+
+  // ===== Pie: distribución por sexo =====
+  if(pieC) pieC.destroy();
+  pieC = new Chart($('ch_pie'), {
+    type:'pie',
+    data:{labels:d.distribucion.labels, datasets:[{data:d.distribucion.values, backgroundColor:[COL.blue, COL.green]}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top', align:'start'}}}
+  });
+
+  // ===== Precipitaciones: 12 meses abreviados, línea con área =====
+  if(precC) precC.destroy();
+  precC = new Chart($('ch_prec'),{
+    type:'line',
+    data:{labels: MESES_CORTOS, datasets:[{
+      label:'Precipitación (mm)', data: to12(d.precipitacion.valores),
+      borderColor:COL.greenHover, backgroundColor:COL.greenTint, fill:true, tension:.35, pointRadius:0, borderWidth:2
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'top', align:'start'}},
+      layout:{padding:{top:4,right:6,bottom:0,left:6}},
+      scales:{
+        x:{ticks:{font:{size:10}, maxRotation:0, autoSkip:false, padding:2}},
+        y:{beginAtZero:true, ticks:{maxTicksLimit:5}}
+      }
+    }
+  });
+}
+
+loadDash();
+document.querySelectorAll('.f-area').forEach(cb => cb.addEventListener('change', loadDash));
+</script>
+{% endblock %}
+
+
+
+

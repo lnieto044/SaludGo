@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Registrar citas — SaludGo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Gestión de citas</h2>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Citas de usuarios (últimas 100)</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th>Lugar</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in appointments %}
+              <tr>
+                <td class="fw-semibold">{{ c['username'] }}</td>
+                <td>{{ c['fecha'] or 'Por definir' }}</td>
+                <td>{{ c['hora'] or 'Por definir' }}</td>
+                <td>{{ c['tipo'] or 'Consulta' }}</td>
+                <td>{{ c['lugar'] or 'Por definir' }}</td>
+                <td>
+                  <span class="badge
+                    {% if c['estado'] == 'Agendada' %} bg-primary
+                    {% elif c['estado'] == 'Solicitud' %} bg-warning text-dark
+                    {% elif c['estado'] == 'Completada' %} bg-success
+                    {% elif c['estado'] == 'Cancelada' %} bg-secondary
+                    {% else %} bg-light text-dark{% endif %}">
+                    {{ c['estado'] or 'Agendada' }}
+                  </span>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6" class="text-muted small">Sin citas registradas aún.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Crear cita para un usuario</h5>
+        <form method="post" class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Usuario</label>
+            <select class="form-select" name="user_id" required>
+              <option value="">Selecciona un usuario...</option>
+              {% for u in users %}
+              <option value="{{ u['id'] }}">{{ u['username'] }}{% if u['email'] %} – {{ u['email'] }}{% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Fecha</label>
+            <input type="date" name="fecha" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Hora</label>
+            <input type="time" name="hora" class="form-control">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Tipo de cita</label>
+            <input class="form-control" name="tipo" placeholder="Medicina general, control, vacunación...">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Lugar</label>
+            <input class="form-control" name="lugar" placeholder="Puesto, hospital, dirección...">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Motivo / nota</label>
+            <textarea class="form-control" name="motivo" rows="3"></textarea>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Estado</label>
+            <select class="form-select" name="estado">
+              <option>Agendada</option>
+              <option>Solicitud</option>
+              <option>Completada</option>
+              <option>Cancelada</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <button class="btn btn-success w-100">Crear cita</button>
+          </div>
+          <div class="col-12">
+            <p class="small text-muted mb-0">
+              Si el usuario tiene correo registrado, se le enviará un email con el detalle de la cita.
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

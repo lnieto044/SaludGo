@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Medicamentos — SaludGo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Gestión de medicamentos</h2>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Medicamentos asignados a usuarios</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Medicamento</th>
+                <th>Dosis</th>
+                <th>Frecuencia</th>
+                <th>Próx. entrega</th>
+                <th>Lugar</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in meds %}
+              <tr>
+                <td class="fw-semibold">{{ m['username'] }}</td>
+                <td>{{ m['medicamento'] }}</td>
+                <td>{{ m['dosis'] or '-' }}</td>
+                <td>{{ m['frecuencia'] or '-' }}</td>
+                <td>{{ m['fecha_entrega'] or '-' }}</td>
+                <td>{{ m['lugar'] or '-' }}</td>
+                <td>
+                  <span class="badge
+                    {% if m['estado'] == 'entregado' %} bg-success
+                    {% elif m['estado'] == 'pendiente' %} bg-warning text-dark
+                    {% else %} bg-secondary{% endif %}">
+                    {{ m['estado'] or 'pendiente' }}
+                  </span>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="7" class="text-muted small">Sin medicamentos registrados aún.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Registrar medicamento para un usuario</h5>
+        <form method="post" class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Usuario</label>
+            <select class="form-select" name="user_id" required>
+              <option value="">Selecciona un usuario...</option>
+              {% for u in users %}
+              <option value="{{ u['id'] }}">{{ u['username'] }}{% if u['email'] %} – {{ u['email'] }}{% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Medicamento</label>
+            <input class="form-control" name="medicamento" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Dosis</label>
+            <input class="form-control" name="dosis" placeholder="Ej: 500 mg">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Frecuencia</label>
+            <input class="form-control" name="frecuencia" placeholder="Ej: cada 8 horas">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Próx. entrega</label>
+            <input type="date" class="form-control" name="fecha_entrega">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Lugar</label>
+            <input class="form-control" name="lugar" placeholder="Puesto, hospital, farmacia...">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Estado</label>
+            <select class="form-select" name="estado">
+              <option value="pendiente">pendiente</option>
+              <option value="entregado">entregado</option>
+              <option value="cancelado">cancelado</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <button class="btn btn-success w-100">Registrar medicamento</button>
+          </div>
+          <div class="col-12">
+            <p class="small text-muted mb-0">
+              Se enviará un correo al usuario si tiene email registrado.
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
