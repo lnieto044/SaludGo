@@ -5,38 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>{% block title %}SaludGo{% endblock %}</title>
 
-  <!-- Fuentes + Bootstrap -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Fuentes y Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Tu CSS -->
+
+  <!-- Estilos propios -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
   {% block head_extra %}{% endblock %}
-  <style>.navbar-brand img{height:38px}</style>
 </head>
-<body>
+<body{% if user %} class="logged-in"{% endif %}>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
-      <!-- Logo en Cloudinary con fallback a texto -->
-      <img src="https://res.cloudinary.com/academia-geek-1/image/upload/v1759081635/logo_crfjxt.jpg"
-           alt="SaludGo"
-           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-      <span class="fw-bold" style="display:none">SaludGo</span>
-    </a>
+<!-- =====================================================
+     NAVBAR GUBERNAMENTAL SALUDGO
+===================================================== -->
+<nav class="navbar navbar-expand-lg fixed-top navbar-gov">
+  <div class="container align-items-center justify-content-between">
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+    <!-- Logos institucionales -->
+    <div class="d-flex align-items-center gap-3">
+      <!-- Cundinamarca -->
+      <a href="https://www.cundinamarca.gov.co" target="_blank"
+         class="d-none d-md-flex align-items-center gov-link"
+         title="Gobernación de Cundinamarca">
+        <img src="https://res.cloudinary.com/dbussh6oa/image/upload/v1762402545/logo-gobernacion_wuzs2f.jpg"
+             alt="Gobernación de Cundinamarca" class="gov-logo">
+      </a>
+
+      <!-- SaludGo -->
+      <a href="{{ url_for('index') }}" class="d-flex align-items-center gap-2">
+        <img src="https://res.cloudinary.com/academia-geek-1/image/upload/v1759081635/logo_crfjxt.jpg"
+             alt="SaludGo" class="saludgo-logo">
+      </a>
+
+      <!-- Boyacá -->
+      <a href="https://www.boyaca.gov.co" target="_blank"
+         class="d-none d-md-flex align-items-center gov-link"
+         title="Gobernación de Boyacá">
+        <img src="https://res.cloudinary.com/dbussh6oa/image/upload/v1762402491/logo_gobernacion_de_cundinamarca_pod8b3.png"
+             alt="Gobernación de Boyacá" class="gov-logo">
+      </a>
+    </div>
+
+    <!-- Botón mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarGov">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="nav" class="collapse navbar-collapse">
-      <!-- Menú público SOLO para visitantes (no autenticados) -->
+    <!-- Contenido colapsable -->
+    <div id="navbarGov" class="collapse navbar-collapse">
+
       {% if not user %}
-      <ul class="navbar-nav mx-auto">
+      <!-- MENÚ PÚBLICO (visitantes) -->
+      <ul class="navbar-nav mx-auto align-items-center">
         <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#servicios">Servicios</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#quienes">Quiénes somos</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#elegirnos">¿Por qué elegirnos?</a></li>
@@ -45,109 +69,118 @@
         <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#contacto">Contáctenos</a></li>
       </ul>
       {% else %}
-      <!-- Usuario logueado (admin o user): sin menú público -->
+      <!-- SIN MENÚ PÚBLICO CUANDO HAY SESIÓN -->
       <ul class="navbar-nav mx-auto"></ul>
       {% endif %}
 
-      <div class="d-flex gap-2">
+      <!-- ZONA DERECHA: roles / login -->
+      <div class="d-flex gap-2 align-items-center">
+
         {% if user %}
-          <span class="navbar-text me-2">Bienvenido, <strong>{{ user['username'] }}</strong></span>
+          <!-- Etiqueta con el usuario -->
+          <span class="navbar-text small text-muted me-2">
+            👤 <strong>{{ user['username'] }}</strong>
+          </span>
 
           {% if user['role'] == 'admin' %}
-            <!-- Menú ADMIN -->
+            <!-- BOTONES ADMIN -->
             <a class="btn btn-outline-success btn-sm" href="{{ url_for('admin') }}">Panel</a>
-            <a class="btn btn-outline-success btn-sm" href="{{ url_for('perfil') }}">Mi perfil</a>
-            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_citas') }}">Registrar cita</a>
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_citas') }}">Citas</a>
             <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_medicamentos') }}">Medicamentos</a>
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reportes') }}">Reportes</a>
+            <a class="btn btn-outline-success btn-sm" href="{{ url_for('perfil') }}">Perfil</a>
           {% else %}
-            <!-- Menú USUARIO -->
-            <a class="btn btn-outline-success btn-sm" href="{{ url_for('perfil') }}">Mi perfil</a>
+            <!-- BOTONES USUARIO NORMAL -->
+            <a class="btn btn-outline-success btn-sm" href="{{ url_for('perfil') }}">Perfil</a>
             <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('mis_citas') }}">Mis citas</a>
           {% endif %}
 
           <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Salir</a>
+
         {% else %}
-          <!-- Botón que abre el modal -->
-          <button class="btn btn-outline-primary btn-sm"
-                  id="btnOpenAuth"
+          <!-- BOTÓN PARA VISITANTES -->
+          <button class="btn btn-pill"
                   data-bs-toggle="modal"
-                  data-bs-target="#authModal"
-                  data-next="">
+                  data-bs-target="#authModal">
             Ingresar / Registrarme
           </button>
         {% endif %}
+
       </div>
     </div>
   </div>
 </nav>
 
-<div style="padding-top:84px"></div>
 
-<!-- ================= FLASHES ================= -->
-<div class="container">
+<div style="padding-top: 90px"></div>
+
+<!-- =====================================================
+     FLASH MESSAGES
+===================================================== -->
+<div class="container mt-2">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="mt-2">
-        {% for cat, msg in messages %}
-          <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
-            {{ msg }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-        {% endfor %}
+      {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       </div>
+      {% endfor %}
     {% endif %}
   {% endwith %}
 </div>
 
-<!-- ================= CONTENIDO ================= -->
+<!-- =====================================================
+     CONTENIDO PRINCIPAL
+===================================================== -->
 {% block content %}{% endblock %}
 
-<footer class="py-4 text-center text-muted">MVP SaludGo · ©2025</footer>
+<footer class="py-3 text-center">
+  <small>© 2025 SaludGo. Plataforma de salud pública aliada con Gobernaciones de Cundinamarca y Boyacá</small>
+</footer>
 
 <!-- ================= MODAL AUTH ================= -->
 <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content auth-modal split-card">
+    <div class="modal-content auth-modal">
       <div class="row g-0 align-items-stretch">
-        <!-- Lado izquierdo -->
-        <div class="col-md-5 d-none d-md-flex split-left auth-hero"
-             style="
-               background:
-                 linear-gradient(135deg, rgba(12,87,155,.9), rgba(23,162,184,.85)),
-                 url('https://res.cloudinary.com/academia-geek-1/image/upload/v1759087228/ChatGPT_Image_28_sept_2025_13_46_43_r3icx0.png')
-                 center/cover no-repeat;
-               color:#fff;
-             ">
-          <div class="p-4 w-100 d-flex flex-column justify-content-between" style="min-height:100%">
+
+        <!-- Lado izquierdo: bloque institucional -->
+        <div class="col-md-5 d-none d-md-flex auth-hero">
+          <div class="auth-hero-inner">
             <div>
-              <span class="badge bg-light text-primary text-uppercase mb-3">
-                SaludGo · Portal de salud
+              <span class="auth-hero-badge">
+                SaludGo · Plataforma de salud pública
               </span>
-              <h3 class="fw-bold mb-2">Organiza tu atención en salud, sin filas.</h3>
-              <p class="mb-0 small">
-                Agenda citas, sigue campañas y coordina servicios de tu territorio desde un solo lugar.
+              <h3 class="auth-hero-title">Acceso seguro a tus servicios de salud</h3>
+              <p class="auth-hero-text">
+                Consulta citas, campañas y reportes desde un entorno pensado para entidades
+                territoriales y ciudadanía.
               </p>
             </div>
-            <ul class="list-unstyled small mt-3 mb-0">
-              <li class="d-flex align-items-center mb-1">
-                <span class="me-2">✅</span><span>Agendamiento en minutos.</span>
-              </li>
-              <li class="d-flex align-items-center mb-1">
-                <span class="me-2">✅</span><span>Recordatorios por correo.</span>
-              </li>
-              <li class="d-flex align-items-center">
-                <span class="me-2">✅</span><span>Enfoque en salud pública y comunidad.</span>
-              </li>
+
+            <ul class="auth-hero-list">
+              <li>Agendamiento y seguimiento en línea.</li>
+              <li>Orientación para equipos de salud y comunidad.</li>
+              <li>Enfoque en salud pública y territorio.</li>
             </ul>
           </div>
         </div>
 
-        <!-- Lado derecho (tabs + formularios) -->
+        <!-- Lado derecho: tabs + formularios -->
         <div class="col-md-7">
-          <div class="p-4">
+          <div class="p-4 p-md-4">
+
+            <!-- Encabezado derecho -->
+            <div class="auth-header mb-3">
+              <h5 class="auth-title mb-1">Acceso a SaludGo</h5>
+              <p class="auth-subtitle mb-0">
+                Ingresa con tu usuario o crea una cuenta para gestionar servicios de salud.
+              </p>
+            </div>
+
             <!-- Tabs: Ingresar / Registrarme / Recuperar clave (oculta) -->
-            <ul class="nav nav-pills auth-tabs mb-4" id="authTabs" role="tablist">
+            <ul class="nav nav-pills auth-tabs mb-3" id="authTabs" role="tablist">
               <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="ingresar-tab"
                         data-bs-toggle="tab" data-bs-target="#ingresar"
@@ -162,7 +195,7 @@
                   Registrarme
                 </button>
               </li>
-              <!-- pestaña de recuperar clave OCULTA -->
+              <!-- pestaña de recuperar clave OCULTA, la activa el botón "¿Olvidaste tu contraseña?" -->
               <li class="nav-item d-none" role="presentation">
                 <button class="nav-link" id="forgot-tab"
                         data-bs-toggle="tab" data-bs-target="#forgot"
@@ -201,14 +234,14 @@
                   </div>
                   <div class="mb-3 d-flex justify-content-end">
                     <button type="button"
-                            class="btn btn-link btn-sm p-0"
+                            class="btn btn-link btn-sm p-0 auth-forgot-link"
                             id="btnForgot">
                       ¿Olvidaste tu contraseña?
                     </button>
                   </div>
 
                   <div class="mt-2">
-                    <button class="btn btn-primary w-100 py-2 fw-bold">Entrar</button>
+                    <button class="btn btn-primary w-100 py-2 fw-semibold auth-main-btn">Entrar</button>
                   </div>
                 </form>
               </div>
@@ -230,11 +263,11 @@
                     <label for="reg_pass" class="form-label">Contraseña</label>
                     <input type="password" class="form-control" id="reg_pass" name="password" minlength="6" required>
                   </div>
-                  <button class="btn btn-primary w-100 py-2 fw-bold">Crear cuenta</button>
+                  <button class="btn btn-primary w-100 py-2 fw-semibold auth-main-btn">Crear cuenta</button>
                 </form>
               </div>
 
-              <!-- TAB: Recuperar clave (no se ve en las pestañas, pero existe) -->
+              <!-- TAB: Recuperar clave (no visible en pestañas, pero funcional) -->
               <div class="tab-pane fade" id="forgot" role="tabpanel" aria-labelledby="forgot-tab">
                 <form method="post" action="{{ url_for('auth_forgot') }}" class="auth-form">
                   <div class="mb-3">
@@ -242,10 +275,10 @@
                     <input type="text" class="form-control" name="identifier" required>
                   </div>
                   <p class="small text-muted mb-3">
-                    Si encontramos una cuenta asociada, te enviaremos un enlace para cambiar tu contraseña.
+                    Si encontramos una cuenta asociada, enviaremos un enlace para cambiar tu contraseña.
                     Tendrás <strong>5 minutos</strong> para usarlo.
                   </p>
-                  <button class="btn btn-primary w-100 py-2 fw-bold">Enviar enlace</button>
+                  <button class="btn btn-primary w-100 py-2 fw-semibold auth-main-btn">Enviar enlace</button>
                 </form>
               </div>
 
@@ -253,7 +286,7 @@
 
             <div class="text-center mt-4 small">
               ¿Tienes dudas?
-              <a class="fw-semibold"
+              <a class="fw-semibold auth-contact-link"
                  href="{{ url_for('index') }}#contacto"
                  id="contactFromAuthModal">
                 Contáctanos
@@ -266,8 +299,11 @@
   </div> <!-- /modal-dialog -->
 </div> <!-- /modal -->
 
+<!-- =====================================================
+     CHATBOT SALUDGO — DOCTORCITO
+===================================================== -->
 {% if not user or user['role'] != 'admin' %}
-<div id="sg-chatbot">
+<div id="sg-chatbot" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999;">
   <!-- Botón flotante -->
   <button id="sg-chat-toggle" class="sg-chat-toggle" type="button" aria-label="Abrir chat SaludGo">
     <span class="sg-chat-toggle-icon">
@@ -278,40 +314,298 @@
   </button>
 
   <!-- Panel del chat -->
-  <div id="sg-chat-panel" class="sg-chat-panel">
+  <div id="sg-chat-panel" class="sg-chat-panel" style="display: none;">
     <div class="sg-chat-header">
       <div class="sg-chat-header-left">
-        
+        <div class="sg-chat-avatar">
+          <img src="https://res.cloudinary.com/dbussh6oa/image/upload/v1762240874/doctor_psfwwp.png" alt="Doctorcito">
+        </div>
         <div>
-          <div class="sg-chat-title">Doctorsito</div>
-          <div class="sg-chat-subtitle">Orientación general en salud y servicios</div>
+          <div class="sg-chat-title">Doctorcito</div>
+          <div class="sg-chat-subtitle">Asistente virtual de SaludGo</div>
         </div>
       </div>
       <button type="button" class="sg-chat-close" id="sg-chat-close" aria-label="Cerrar chat">×</button>
     </div>
 
-    <div id="sg-chat-messages" class="sg-chat-messages">
-      <div class="sg-chat-message sg-chat-message-bot">
-        <div class="sg-chat-bubble">
-          <strong>Hola 👋 Soy Doctorsito de SaludGo.</strong><br>
-          Puedo orientarte sobre citas, campañas de salud, medicamentos registrados
-          y cómo participar como voluntario.<br><br>
-          Cuéntame, ¿en qué te puedo ayudar hoy?
-        </div>
-      </div>
-    </div>
+    <div id="sg-chat-messages" class="sg-chat-messages"></div>
 
     <form id="sg-chat-form" class="sg-chat-input-area">
       <textarea id="sg-chat-input" class="sg-chat-input" rows="1"
-                placeholder="Escribe tu duda aquí..." required></textarea>
-      <button class="sg-chat-send" type="submit">Enviar</button>
+                placeholder="Escribe aquí..." required></textarea>
+      <button class="sg-chat-send" type="submit">
+        <i class="fa fa-paper-plane"></i> Enviar
+      </button>
     </form>
   </div>
 </div>
 {% endif %}
 
 
-<!-- ================= SCRIPTS ================= -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // ============================
+  // VARIABLES BASE
+  // ============================
+  const chatToggle = document.getElementById("sg-chat-toggle");
+  const chatPanel = document.getElementById("sg-chat-panel");
+  const chatClose = document.getElementById("sg-chat-close");
+  const chatForm = document.getElementById("sg-chat-form");
+  const chatInput = document.getElementById("sg-chat-input");
+  const chatMsgs = document.getElementById("sg-chat-messages");
+
+ // ============================
+  // SONIDO INSTITUCIONAL
+  // ============================
+  const chatSound = new Audio("https://res.cloudinary.com/dbussh6oa/video/upload/v1762465289/live-chat-353605_xe8hq7.mp3");
+  chatSound.volume = 0.6;
+
+  // Activar contexto de audio con la primera interacción del usuario
+  document.body.addEventListener("click", function activarSonido() {
+    chatSound.play().then(() => {
+      chatSound.pause();
+      chatSound.currentTime = 0;
+      document.body.removeEventListener("click", activarSonido);
+    }).catch(() => {});
+  });
+
+  function playSound() {
+    chatSound.currentTime = 0;
+    chatSound.play().catch(() => {});
+  }
+
+  // ============================
+  // FUNCIONES DE MENSAJE
+  // ============================
+  function addChatMessage(text, sender) {
+    const wrap = document.createElement("div");
+    wrap.className =
+      "sg-chat-message " +
+      (sender === "user" ? "sg-chat-message-user" : "sg-chat-message-bot");
+    const bubble = document.createElement("div");
+    bubble.className = "sg-chat-bubble";
+    bubble.textContent = text;
+    wrap.appendChild(bubble);
+    chatMsgs.appendChild(wrap);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  }
+
+  const chatHistory = [];
+  function saveMessage(sender, message) {
+    chatHistory.push({ sender, message });
+  }
+
+  // ============================
+  // ESTADOS Y VARIABLES
+  // ============================
+  let estado = "datos";
+  let userData = { nombre: "", cedula: "", telefono: "" };
+
+  const menuOpciones = `Puedo ayudarte con los siguientes temas:
+
+1️⃣  Agendar una cita
+2️⃣  Consultar medicamentos
+3️⃣  Ver campañas de salud
+4️⃣  Participar como voluntario
+
+✏️ Escribe el número de la opción que deseas.`;
+
+  const respuestasFijas = {
+    1: `🩺 Sobre citas en SaludGo:\n
+     1️⃣ Si ya tienes cuenta, ingresa con tu usuario y ve al menú «Mis citas».\n
+     2️⃣ Elige el tipo de cita, la fecha y la hora disponible.\n
+     3️⃣ Si registraste tu correo, te enviaremos confirmación por email.\n
+    Si todavía no tienes cuenta, crea una desde el botón «Ingresar / Registrarme» o comunícate con la línea SaludGo 01-8000-000-000.`,
+    2: `💊 En SaludGo registramos medicamentos que el equipo de salud te ha indicado.\n
+            Puedes verlos en «Mi perfil» → sección «Medicamentos».\n
+            Si falta un medicamento, la dosis cambió o tienes efectos adversos,
+            debes comentarlo directamente con tu IPS o en el punto de atención más cercano.`,
+           
+    3: `📅 Sobre campañas y brigadas de salud:\n
+            • En la página de inicio puedes ver campañas en las secciones de «Publicaciones» y «Participa».\n
+            • Si quieres que se programe una jornada en tu zona, puedes contarnos la situación
+            desde la sección «Participa».\n
+            • También puedes registrar tu disponibilidad para apoyar como voluntario.`,
+    4: `🤝 ¡Gracias por querer apoyar! 💚\n
+            "Para vincularte como voluntario o líder comunitario:\n
+            1️⃣ Ve a la sección «Participa».\n
+            2️⃣ Diligencia el formulario de «Disponibilidad para apoyar campañas».\n
+            3️⃣ El equipo de coordinación usará esa base de datos para planear jornadas y contactarte.`
+  };
+
+  // ============================
+  // PROCESAMIENTO PRINCIPAL
+  // ============================
+  async function procesarMensaje(msg) {
+    const texto = msg.trim();
+    if (!texto) return;
+
+    addChatMessage(texto, "user");
+    saveMessage("user", texto);
+    chatInput.value = "";
+    playSound();
+
+    // ---------------- DATOS DEL USUARIO ----------------
+    if (estado === "datos") {
+      if (!userData.nombre) {
+        userData.nombre = texto;
+        addChatMessage("Gracias, " + userData.nombre + ". ¿Podrías indicarme tu número de cédula?", "bot");
+        saveMessage("bot", "Gracias, " + userData.nombre + ". ¿Podrías indicarme tu número de cédula?");
+        return;
+      }
+
+      if (!userData.cedula) {
+        userData.cedula = texto;
+        addChatMessage("Perfecto. Finalmente, ¿podrías compartir tu número de contacto?", "bot");
+        saveMessage("bot", "Perfecto. Finalmente, ¿podrías compartir tu número de contacto?");
+        return;
+      }
+
+      if (!userData.telefono) {
+        userData.telefono = texto;
+        addChatMessage(
+          "Gracias por tus datos, " + userData.nombre + ". 👨‍⚕️ Aquí tienes las opciones disponibles:",
+          "bot"
+        );
+        saveMessage(
+          "bot",
+          "Gracias por tus datos, " + userData.nombre + ". 👨‍⚕️ Aquí tienes las opciones disponibles:"
+        );
+
+        setTimeout(() => {
+          addChatMessage(menuOpciones, "bot");
+          saveMessage("bot", menuOpciones);
+          estado = "menu";
+        }, 800);
+        return;
+      }
+    }
+
+    // ---------------- MENU PRINCIPAL ----------------
+    if (estado === "menu") {
+      if (["1", "2", "3", "4"].includes(texto)) {
+        const resp = respuestasFijas[texto];
+        addChatMessage(resp, "bot");
+        saveMessage("bot", resp);
+        playSound();
+
+        setTimeout(() => {
+          addChatMessage("¿Hay algo más en lo que pueda colaborarte? 1️⃣ Sí  2️⃣ No", "bot");
+          saveMessage("bot", "¿Hay algo más en lo que pueda colaborarte? 1️⃣ Sí  2️⃣ No");
+          estado = "post";
+        }, 1000);
+      } else {
+        // Si no es una opción, lo envía al backend con IA
+        const resp = await fetch("/chatbot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: texto })
+        });
+        const data = await resp.json();
+        addChatMessage(data.reply, "bot");
+        saveMessage("bot", data.reply);
+        playSound();
+
+        setTimeout(() => {
+          addChatMessage("¿Hay algo más en lo que pueda colaborarte? 1️⃣ Sí  2️⃣ No", "bot");
+          saveMessage("bot", "¿Hay algo más en lo que pueda colaborarte? 1️⃣ Sí  2️⃣ No");
+          estado = "post";
+        }, 1200);
+      }
+      return;
+    }
+
+    // ---------------- DESPUÉS DE RESPUESTA ----------------
+    if (estado === "post") {
+      if (["1", "sí", "si", "1️⃣"].includes(texto.toLowerCase())) {
+        addChatMessage("Perfecto, aquí tienes nuevamente las opciones:", "bot");
+        saveMessage("bot", "Perfecto, aquí tienes nuevamente las opciones:");
+        setTimeout(() => {
+          addChatMessage(menuOpciones, "bot");
+          saveMessage("bot", menuOpciones);
+          estado = "menu";
+        }, 800);
+      } else if (["2", "no", "2️⃣"].includes(texto.toLowerCase())) {
+        const cierre =
+          "Gracias por contactarte con SaludGo. 🌿\nRecuerda que juntos cuidamos la salud de nuestras comunidades en Cundinamarca y Boyacá. 🏥\nHasta pronto 💙";
+        addChatMessage(cierre, "bot");
+        saveMessage("bot", cierre);
+        playSound();
+        enviarHistorial();
+        estado = "fin";
+      } else {
+        addChatMessage("Por favor escribe 1 para Sí o 2 para No.", "bot");
+        saveMessage("bot", "Por favor escribe 1 para Sí o 2 para No.");
+      }
+    }
+  }
+
+ // ============================
+  // GUARDAR HISTORIAL EN BASE DE DATOS
+  // ============================
+  async function enviarHistorial() {
+    try {
+      await fetch("/save_chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userData, chatHistory })
+      });
+    } catch (err) {
+      console.error("Error guardando chat:", err);
+    }
+  }
+
+  // ============================
+  // EVENTOS
+  // ============================
+  chatForm.addEventListener("submit", e => {
+    e.preventDefault();
+    procesarMensaje(chatInput.value);
+  });
+
+  chatClose.addEventListener("click", () => {
+    chatPanel.style.display = "none";
+    enviarHistorial();
+  });
+
+ // ============================
+  // SALUDO AUTOMÁTICO CON SONIDO
+  // ============================
+  setTimeout(() => {
+    chatPanel.style.display = "flex";
+    playSound();
+    addChatMessage("👋 Bienvenido a SaludGo. Soy Doctorcito. ¿Cuál es tu nombre completo?", "bot");
+    saveMessage("bot", "👋 Bienvenido a SaludGo. Soy Doctorcito. ¿Cuál es tu nombre completo?");
+  }, 1500);
+
+  // ============================
+  // PIE DE PÁGINA INSTITUCIONAL
+  // ============================
+  const footer = document.createElement("div");
+  footer.className = "sg-chat-footer";
+  footer.innerHTML = `
+    <div class="sg-footer-content">
+      <img src="https://res.cloudinary.com/dbussh6oa/image/upload/v1762402545/logo-gobernacion_wuzs2f.jpg" 
+           alt="Gobernación de Cundinamarca" class="gov-logo">
+      <img src="https://res.cloudinary.com/dbussh6oa/image/upload/v1762402491/logo_gobernacion_de_cundinamarca_pod8b3.png" 
+           alt="Gobernación de Boyacá" class="gov-logo">
+    </div>
+    <p class="sg-footer-text">
+      Plataforma de salud pública aliada con Gobernaciones de Cundinamarca y Boyacá.
+    </p>
+  `;
+  chatPanel.appendChild(footer);
+});
+</script>
+
+
+
+
+
+<!-- =====================================================
+     SCRIPTS GLOBALES
+===================================================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
@@ -412,91 +706,20 @@
     if (sg) sg.value = next;
   });
 
-      // === Chatbot SaludGo ===
-    const chatToggle = document.getElementById('sg-chat-toggle');
-    const chatPanel  = document.getElementById('sg-chat-panel');
-    const chatClose  = document.getElementById('sg-chat-close');
-    const chatForm   = document.getElementById('sg-chat-form');
-    const chatInput  = document.getElementById('sg-chat-input');
-    const chatMsgs   = document.getElementById('sg-chat-messages');
-
-    function scrollChatToBottom() {
-      if (chatMsgs) {
-        chatMsgs.scrollTop = chatMsgs.scrollHeight;
-      }
-    }
-
-    function addChatMessage(text, sender) {
-      if (!chatMsgs) return;
-      const wrap = document.createElement('div');
-      wrap.className = 'sg-chat-message ' + (sender === 'user'
-                          ? 'sg-chat-message-user' : 'sg-chat-message-bot');
-      const bubble = document.createElement('div');
-      bubble.className = 'sg-chat-bubble';
-      bubble.textContent = text;
-      wrap.appendChild(bubble);
-      chatMsgs.appendChild(wrap);
-      scrollChatToBottom();
-    }
-
-    let typingEl = null;
-    function showTyping() {
-      if (!chatMsgs) return;
-      typingEl = document.createElement('div');
-      typingEl.className = 'sg-chat-typing';
-      typingEl.textContent = 'SaludGo Bot está escribiendo...';
-      chatMsgs.appendChild(typingEl);
-      scrollChatToBottom();
-    }
-    function hideTyping() {
-      if (typingEl && typingEl.parentNode) {
-        typingEl.parentNode.removeChild(typingEl);
-        typingEl = null;
-      }
-    }
-
-    if (chatToggle && chatPanel) {
-      chatToggle.addEventListener('click', function () {
-        const isOpen = chatPanel.style.display === 'flex';
-        chatPanel.style.display = isOpen ? 'none' : 'flex';
-      });
-    }
-    if (chatClose && chatPanel) {
-      chatClose.addEventListener('click', function () {
-        chatPanel.style.display = 'none';
-      });
-    }
-
-    if (chatForm && chatInput) {
-      chatForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const text = chatInput.value.trim();
-        if (!text) return;
-        addChatMessage(text, 'user');
-        chatInput.value = '';
-        showTyping();
-
-        try {
-          const resp = await fetch('{{ url_for("api_chatbot_message") }}', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
-          });
-          const data = await resp.json();
-          hideTyping();
-          if (data && data.reply) {
-            addChatMessage(data.reply, 'bot');
-          } else {
-            addChatMessage('Lo siento, hubo un problema al procesar tu mensaje. Intenta nuevamente.', 'bot');
-          }
-        } catch (err) {
-          hideTyping();
-          addChatMessage('No pude conectar con el servidor en este momento. Revisa tu conexión e inténtalo más tarde.', 'bot');
-        }
-      });
-    }
-
+      
 </script>
+<script>
+  window.addEventListener("scroll", function() {
+    const nav = document.querySelector(".navbar-gov");
+    if (window.scrollY > 20) {
+      nav.classList.add("scrolled");
+    } else {
+      nav.classList.remove("scrolled");
+    }
+  });
+</script>
+
+
 
 {% block scripts_extra %}{% endblock %}
 </body>
