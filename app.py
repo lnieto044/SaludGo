@@ -190,6 +190,9 @@ CREATE TABLE IF NOT EXISTS meds (
 CREATE TABLE IF NOT EXISTS chat_sessions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
+  nombre TEXT,
+  cedula TEXT,
+  telefono TEXT,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
@@ -202,6 +205,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(session_id) REFERENCES chat_sessions(id)
 );
+
 """
 
 def init_db():
@@ -267,7 +271,7 @@ def admin_required(view):
 POSTS = [
     {
         "title": "Brigada de salud en zona rural de Cundinamarca",
-        "img": "https://res.cloudinary.com/academia-geek-1/image/upload/v1759087228/ChatGPT_Image_28_sept_2025_14_15_07_f15myp.png",
+        "img": "https://res.cloudinary.com/dbussh6oa/image/upload/v1762473518/atencion_comunitaria_onbhit.png",
         "excerpt": "Más de 600 personas recibieron valoración, vacunación y educación en autocuidado...",
         "date": "15 Dic, 2025",
         "tags": ["Promoción", "Extramural"],
@@ -275,7 +279,7 @@ POSTS = [
     },
     {
         "title": "Avances del plan de vacunación 2025",
-        "img": "https://res.cloudinary.com/academia-geek-1/image/upload/v1759087228/ChatGPT_Image_28_sept_2025_13_46_43_r3icx0.png",
+        "img": "https://res.cloudinary.com/dbussh6oa/image/upload/v1762473570/avance_vacunacion_iocr9x.png",
         "excerpt": "Reportamos coberturas superiores al 95% en biológicos del PAI gracias a rutas móviles...",
         "date": "02 Dic, 2025",
         "tags": ["Vacunación", "Coberturas"],
@@ -283,7 +287,7 @@ POSTS = [
     },
     {
         "title": "Atención centrada en las personas",
-        "img": "https://res.cloudinary.com/academia-geek-1/image/upload/v1759087227/ChatGPT_Image_28_sept_2025_14_14_44_vqy4pe.png",
+        "img": "https://res.cloudinary.com/dbussh6oa/image/upload/v1762473653/jornada_vacunacion_wredut.png",
         "excerpt": "Implementamos rondas de satisfacción y protocolos de comunicación...",
         "date": "22 Nov, 2025",
         "tags": ["Calidad", "Humanización"],
@@ -1503,12 +1507,8 @@ def contacto():
     flash("Gracias por contactarnos. Te responderemos pronto.", "success")
     return redirect(url_for("index"))
 
-# ------------------------ Generar respuesta chatbots ------------------------
+# ------------------------ Chatbot básico ------------------------
 def generate_chatbot_reply(text: str) -> str:
-    """
-    Respuesta simple del chatbot basada en palabras clave.
-    Aquí podrías luego conectar un modelo real (OpenAI, etc.).
-    """
     text_low = (text or "").lower()
 
     base_footer = (
@@ -1530,7 +1530,7 @@ def generate_chatbot_reply(text: str) -> str:
             "Sobre campañas y brigadas de salud:\n\n"
             "• En la página de inicio puedes ver campañas en las secciones de «Publicaciones» y «Participa».\n"
             "• Si quieres que se programe una jornada en tu zona, puedes contarnos la situación "
-            "desde la sección «Participa» en el formulario de reporte de síntomas.\n"
+            "desde la sección «Participa».\n"
             "• También puedes registrar tu disponibilidad para apoyar como voluntario."
         )
     elif "medicamento" in text_low or "medicina" in text_low or "tratamiento" in text_low:
@@ -1551,7 +1551,7 @@ def generate_chatbot_reply(text: str) -> str:
     elif "contacto" in text_low or "teléfono" in text_low or "correo" in text_low:
         reply = (
             "Si necesitas ponerte en contacto con el equipo coordinador:\n\n"
-            "• Usa el formulario de «Contáctenos» en la parte final de la página principal.\n"
+            "• Usa el formulario de «Contáctenos» al final de la página principal.\n"
             "• Allí puedes dejar tus datos y tu mensaje; te responderemos por correo.\n"
             "• Si es una urgencia médica, por favor no uses el formulario, sino los canales de emergencia."
         )
@@ -1570,6 +1570,43 @@ def generate_chatbot_reply(text: str) -> str:
     return reply + base_footer
 
 
+# ------------------------ Endpoint de respuestas ------------------------
+@app.route("/chatbot", methods=["POST"])
+def chatbot():
+    data = request.json
+    text = data.get("message", "")
+    reply = generate_chatbot_reply(text)
+    return jsonify({"reply": reply})
+
+
+# ------------------------ Guardar historial ------------------------
+@app.route("/save_chat", methods=["POST"])
+def save_chat():
+    data = request.json
+    nombre = data["userData"].get("nombre", "")
+    cedula = data["userData"].get("cedula", "")
+    telefono = data["userData"].get("telefono", "")
+    mensajes = data["chatHistory"]
+
+    conn = sqlite3.connect("saludgo.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO chat_sessions (user_id, nombre, cedula, telefono)
+        VALUES (NULL, ?, ?, ?)
+    """, (nombre, cedula, telefono))
+    session_id = cur.lastrowid
+
+    for msg in mensajes:
+        cur.execute("""
+            INSERT INTO chat_messages (session_id, sender, message)
+            VALUES (?, ?, ?)
+        """, (session_id, msg["sender"], msg["message"]))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"status": "ok"})
 # ------------------------ Main ------------------------
 
 if __name__ == "__main__":
