@@ -46,119 +46,7 @@ img {
   display: block;
 }
 
-/* ===== NAVBAR GUBERNAMENTAL MODERNA ===== */
-.navbar-gov {
-  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
-  border-bottom: 3px solid var(--sg-green);
-  font-family: 'Poppins', sans-serif;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  z-index: 1000;
-}
 
-/* Cuando haces scroll, se eleva un poco */
-.navbar-gov.scrolled {
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-/* Logos institucionales */
-.gov-logo {
-  height: 38px;
-  object-fit: contain;
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.saludgo-logo {
-  height: 48px;
-  transition: transform 0.25s ease;
-}
-.gov-link:hover .gov-logo,
-.saludgo-logo:hover {
-  transform: scale(1.04);
-  opacity: 0.9;
-}
-
-/* Enlaces del menú */
-.navbar-gov .nav-link {
-  color: #1e293b;
-  font-weight: 500;
-  font-size: 15px;
-  margin: 0 12px;
-  position: relative;
-  transition: color 0.2s ease;
-}
-.navbar-gov .nav-link:hover {
-  color: var(--sg-blue);
-}
-.navbar-gov .nav-link::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0%;
-  height: 2px;
-  background: var(--sg-green);
-  transition: width 0.25s ease;
-}
-.navbar-gov .nav-link:hover::after {
-  width: 100%;
-}
-
-
-/* Botón principal */
-.btn.btn-pill {
-  border-radius: 25px;
-  font-size: 14px;
-  font-weight: 500;
-  background-color: var(--sg-blue);
-  color: #fff;
-  border: none;
-  transition: all 0.3s ease;
-  padding: 6px 18px;
-}
-.btn.btn-pill:hover {
-  background-color: #1b63d8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(47,128,237,0.35);
-}
-
-/* ===== Vista móvil ===== */
-@media (max-width: 992px) {
-  .navbar-gov {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
-
-  .navbar-toggler {
-    border: none;
-  }
-  .navbar-toggler:focus {
-    box-shadow: none;
-  }
-
-  .navbar-gov .collapse {
-    background: #ffffff;
-    border-top: 2px solid var(--sg-green);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    margin-top: 6px;
-    border-radius: 0 0 12px 12px;
-  }
-
-  .navbar-gov .nav-link {
-    font-size: 16px;
-    text-align: center;
-    padding: 10px 0;
-    margin: 0;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .navbar-gov .btn-pill {
-    display: block;
-    width: 100%;
-    margin: 8px 0;
-    border-radius: 20px;
-  }
-}
 
 /* ===== MODAL AUTH SALUDGO ===== */
 .auth-modal {
@@ -1205,7 +1093,7 @@ body.logged-in .navbar-gov.scrolled {
 }
 
 /* === Carrusel Institucional (imágenes completas, altura fija, proporción real) === */
-/* === Carrusel Institucional (mantener tamaño original de las imágenes) === */
+
 .saludgo-hero {
   position: relative;
   width: 100%;
@@ -1306,6 +1194,207 @@ footer {
   color: var(--sg-gray-700);
   font-size: .9rem;
   padding: 1rem;
+}
+
+/* ===========================================================
+   NAVBAR SALUDGO — INSTITUCIONAL Y RESPONSIVO
+   =========================================================== */
+
+/* Base institucional */
+.navbar-gov {
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  border-bottom: 3px solid var(--sg-green);
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+/* Efecto al hacer scroll */
+.navbar-gov.scrolled {
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Logos */
+.gov-logo {
+  height: 38px;
+  object-fit: contain;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.saludgo-logo {
+  height: 48px;
+  transition: transform 0.25s ease;
+}
+.gov-link:hover .gov-logo,
+.saludgo-logo:hover {
+  transform: scale(1.04);
+  opacity: 0.9;
+}
+
+/* Enlaces principales */
+.navbar-gov .nav-link {
+  color: #1e293b;
+  font-weight: 500;
+  font-size: 15px;
+  margin: 0 12px;
+  position: relative;
+  transition: color 0.2s ease;
+}
+.navbar-gov .nav-link:hover {
+  color: var(--sg-blue);
+}
+.navbar-gov .nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0%;
+  height: 2px;
+  background: var(--sg-green);
+  transition: width 0.25s ease;
+}
+.navbar-gov .nav-link:hover::after {
+  width: 100%;
+}
+
+/* Botón principal */
+.btn.btn-pill {
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: var(--sg-blue);
+  color: #fff;
+  border: none;
+  transition: all 0.3s ease;
+  padding: 6px 18px;
+}
+.btn.btn-pill:hover {
+  background-color: #1b63d8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(47,128,237,0.35);
+}
+
+/* ===========================================================
+   💻 PC (≥993 px): Menú horizontal
+   =========================================================== */
+@media (min-width: 993px) {
+  .navbar-gov .navbar-nav.mx-auto {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .navbar-gov .btn {
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+  }
+}
+
+/* ===========================================================
+   📱 Tablets y móviles (≤992 px): Menú vertical
+   =========================================================== */
+@media (max-width: 992px) {
+  .navbar-gov .navbar-nav.mx-auto {
+    display: flex;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start;
+    width: 100%;
+    background: #ffffff;
+    border-top: 2px solid var(--sg-green);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 0 0 12px 12px;
+    padding: 1rem 0;
+    gap: 10px;
+  }
+
+  .navbar-gov .btn {
+    display: block;
+    width: 90%;
+    max-width: 340px;
+    text-align: center;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.7rem 0.8rem;
+    transition: all 0.25s ease;
+  }
+
+  /* Colores institucionales */
+  .navbar-gov .btn-outline-success {
+    color: var(--sg-green);
+    border-color: var(--sg-green);
+  }
+  .navbar-gov .btn-outline-success:hover {
+    background: var(--sg-green);
+    color: #fff;
+  }
+
+  .navbar-gov .btn-outline-primary {
+    color: var(--sg-blue);
+    border-color: var(--sg-blue);
+  }
+  .navbar-gov .btn-outline-primary:hover {
+    background: var(--sg-blue);
+    color: #fff;
+  }
+
+  .navbar-gov .btn-outline-secondary {
+    color: var(--sg-gray-700);
+    border-color: var(--sg-gray-300);
+  }
+  .navbar-gov .btn-outline-secondary:hover {
+    background: var(--sg-gray-300);
+  }
+
+  .navbar-gov .btn-danger {
+    background: var(--sg-red);
+    border-color: var(--sg-red);
+    color: #fff;
+  }
+  .navbar-gov .btn-danger:hover {
+    background: #c91820;
+  }
+
+  .navbar-gov .navbar-text {
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: var(--sg-gray-700);
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+
+  .navbar-gov,
+  .navbar-gov .collapse,
+  .navbar-gov .container {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Animación suave al desplegar */
+  .navbar-gov .navbar-nav.mx-auto .btn {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.4s forwards;
+  }
+  .navbar-gov .navbar-nav.mx-auto .btn:nth-child(1) { animation-delay: 0.05s; }
+  .navbar-gov .navbar-nav.mx-auto .btn:nth-child(2) { animation-delay: 0.1s; }
+  .navbar-gov .navbar-nav.mx-auto .btn:nth-child(3) { animation-delay: 0.15s; }
+  .navbar-gov .navbar-nav.mx-auto .btn:nth-child(4) { animation-delay: 0.2s; }
+  .navbar-gov .navbar-nav.mx-auto .btn:nth-child(5) { animation-delay: 0.25s; }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 
