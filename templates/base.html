@@ -22,12 +22,14 @@
 <!-- =====================================================
      NAVBAR GUBERNAMENTAL SALUDGO
 ===================================================== -->
+<!-- =====================================================
+     NAVBAR GUBERNAMENTAL SALUDGO - UNIFICADO
+===================================================== -->
 <nav class="navbar navbar-expand-lg fixed-top navbar-gov">
   <div class="container align-items-center justify-content-between">
 
     <!-- Logos institucionales -->
     <div class="d-flex align-items-center gap-3">
-      <!-- Cundinamarca -->
       <a href="https://www.cundinamarca.gov.co" target="_blank"
          class="d-none d-md-flex align-items-center gov-link"
          title="Gobernación de Cundinamarca">
@@ -35,13 +37,11 @@
              alt="Gobernación de Cundinamarca" class="gov-logo">
       </a>
 
-      <!-- SaludGo -->
       <a href="{{ url_for('index') }}" class="d-flex align-items-center gap-2">
         <img src="https://res.cloudinary.com/academia-geek-1/image/upload/v1759081635/logo_crfjxt.jpg"
              alt="SaludGo" class="saludgo-logo">
       </a>
 
-      <!-- Boyacá -->
       <a href="https://www.boyaca.gov.co" target="_blank"
          class="d-none d-md-flex align-items-center gov-link"
          title="Gobernación de Boyacá">
@@ -58,54 +58,44 @@
     <!-- Contenido colapsable -->
     <div id="navbarGov" class="collapse navbar-collapse">
 
-      {% if not user %}
-      <!-- MENÚ PÚBLICO (visitantes) -->
       <ul class="navbar-nav mx-auto align-items-center">
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#servicios">Servicios</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#quienes">Quiénes somos</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#elegirnos">¿Por qué elegirnos?</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#publicaciones">Publicaciones</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('participa') }}">Participa</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#contacto">Contáctenos</a></li>
-      </ul>
-      {% else %}
-      <!-- SIN MENÚ PÚBLICO CUANDO HAY SESIÓN -->
-      <ul class="navbar-nav mx-auto"></ul>
-      {% endif %}
-
-      <!-- ZONA DERECHA: roles / login -->
-      <div class="d-flex gap-2 align-items-center">
-
-        {% if user %}
-          <!-- Etiqueta con el usuario -->
-          <span class="navbar-text small text-muted me-2">
-            👤 <strong>{{ user['username'] }}</strong>
-          </span>
-
-          {% if user['role'] == 'admin' %}
-            <!-- BOTONES ADMIN -->
-            <a class="btn btn-outline-success btn-sm" href="{{ url_for('admin') }}">Panel</a>
-            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_citas') }}">Citas</a>
-            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_medicamentos') }}">Medicamentos</a>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reportes') }}">Reportes</a>
-            <a class="btn btn-outline-success btn-sm" href="{{ url_for('perfil') }}">Perfil</a>
-          {% else %}
-            <!-- BOTONES USUARIO NORMAL -->
-            <a class="btn btn-outline-success btn-sm" href="{{ url_for('perfil') }}">Perfil</a>
-            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('mis_citas') }}">Mis citas</a>
-          {% endif %}
-
-          <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Salir</a>
-
+        {% if not user %}
+          <!-- Menú público -->
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#servicios">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#quienes">Quiénes somos</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#elegirnos">¿Por qué elegirnos?</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#publicaciones">Publicaciones</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('participa') }}">Participa</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#contacto">Contáctenos</a></li>
         {% else %}
-          <!-- BOTÓN PARA VISITANTES -->
+          <!-- Menú para usuario logueado -->
+          {% if user['role'] == 'admin' %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('admin') }}">Panel</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_citas') }}">Citas</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_medicamentos') }}">Medicamentos</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('reportes') }}">Reportes</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('perfil') }}">Perfil</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('perfil') }}">Perfil</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('mis_citas') }}">Mis citas</a></li>
+          {% endif %}
+        {% endif %}
+      </ul>
+
+      <!-- Botón derecho -->
+      <div class="d-flex align-items-center">
+        {% if not user %}
           <button class="btn btn-pill"
                   data-bs-toggle="modal"
                   data-bs-target="#authModal">
             Ingresar / Registrarme
           </button>
+        {% else %}
+          <span class="navbar-text small text-muted me-2">
+            👤 <strong>{{ user['username'] }}</strong>
+          </span>
+          <a class="btn btn-pill btn-logout" href="{{ url_for('logout') }}">Salir</a>
         {% endif %}
-
       </div>
     </div>
   </div>
@@ -340,9 +330,6 @@
   </div>
 </div>
 {% endif %}
-
-
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   // ============================
@@ -718,9 +705,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 </script>
-
-
-
 {% block scripts_extra %}{% endblock %}
 </body>
 </html>
